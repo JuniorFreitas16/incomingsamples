@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Item - Output de Itens em QMLOT</title>
+    <style>
+        /* O mesmo estilo do `index.html` pode ser utilizado aqui */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <a href="index.html">Cadastrar Novo Item</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="list.html">Lista de Itens</a>
+        </div>
+        <h1>Editar Item</h1>
+        <form id="editForm">
+            <label for="inputData">Data Input:</label>
+            <input type="datetime-local" id="inputData" required>
+
+            <label for="inspectionLot">Inspection Lot:</label>
+            <input type="number" id="inspectionLot" required>
+
+            <label for="plantNumber">Número Planta:</label>
+            <input type="text" id="plantNumber" required>
+
+            <label for="location">Locação:</label>
+            <input type="text" id="location" required>
+
+            <label for="material">Material:</label>
+            <input type="text" id="material" required>
+
+            <label for="description">Descrição:</label>
+            <input type="text" id="description" required>
+
+            <label for="quantity">Quantidade Lote:</label>
+            <input type="number" id="quantity" required>
+
+            <label for="samplePlan">Plano de Amostra:</label>
+            <input type="text" id="samplePlan" readonly>
+
+            <label for="status">Status Atual:</label>
+            <select id="status" required>
+                <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                <option value="Finalizado">Finalizado</option>
+            </select>
+
+            <label for="iqcCollaborator">Colaborador IQC:</label>
+            <input type="text" id="iqcCollaborator" required>
+
+            <label for="finishTime">Hora de Conclusão:</label>
+            <input type="datetime-local" id="finishTime" >
+
+            <button type="submit">Salvar Alterações</button>
+        </form>
+    </div>
+
+    <script>
+         // Configuração da data de Manaus
+         const now = new Date();
+        now.setHours(now.getUTCHours() - 8);  // Ajuste para horário de Manaus
+        
+        
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('QMLOT_DB', 1);
+
+                request.onsuccess = function(event) {
+                    resolve(event.target.result);
+                };
+
+                request.onerror = function(event) {
+                    reject(event.target.error);
+                };
+
+                request.onupgradeneeded = function(event) {
+                    const db = event.target.result;
+                    const objectStore = db.createObjectStore('samples', { keyPath: 'id', autoIncrement: true });
+                    objectStore.createIndex('inputData', 'inputData', { unique: false });
+                    objectStore.createIndex('inspectionLot', 'inspectionLot', { unique: false });
+                    objectStore.createIndex('plantNumber', 'plantNumber', { unique: false });
+                    objectStore.createIndex('location', 'location', { unique: false });
+                    objectStore.createIndex('material', 'material', { unique: false });
+                    objectStore.createIndex('description', 'description', { unique: false });
+                    objectStore.createIndex('quantity', 'quantity', { unique: false });
+                    objectStore.createIndex('samplePlan', 'samplePlan', { unique: false });
+                    objectStore.createIndex('status', 'status', { unique: false });
+                    objectStore.createIndex('iqcCollaborator', 'iqcCollaborator', { unique: false });
+                    objectStore.createIndex('finishTime', 'finishTime', { unique: false});
+                };
+            });
+        }
+
+        function loadSample(id) {
+            return openDatabase().then(db => {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(['samples'], 'readonly');
+                    const objectStore = transaction.objectStore('samples');
+                    const request = objectStore.get(id);
+
+                    request.onsuccess = function() {
+                        resolve(request.result);
+                    };
+
+                    request.onerror = function(event) {
+                        reject(event.target.error);
+                    };
+                });
+            });
+        }
+
+        function updateSample(id, data) {
+            return openDatabase().then(db => {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction(['samples'], 'readwrite');
+                    const objectStore = transaction.objectStore('samples');
+                    const request = objectStore.put({ id, ...data });
+
+                    request.onsuccess = function() {
+                        resolve();
+                    };
+
+                    request.onerror = function(event) {
+                        reject(event.target.error);
+                    };
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const id = getQueryParam('id');
+
+            if (!id) {
+                alert('ID não fornecido.');
+                return;
+            }
+
+            loadSample(parseInt(id)).then(sample => {
+                if (sample) {
+                    document.getElementById('inputData').value = sample.inputData;
+                    document.getElementById('inspectionLot').value = sample.inspectionLot;
+                    document.getElementById('plantNumber').value = sample.plantNumber;
+                    document.getElementById('location').value = sample.location;
+                    document.getElementById('material').value = sample.material;
+                    document.getElementById('description').value = sample.description;
+                    document.getElementById('quantity').value = sample.quantity;
+                    document.getElementById('samplePlan').value = sample.samplePlan;
+                    document.getElementById('status').value = sample.status;
+                    document.getElementById('iqcCollaborator').value = sample.iqcCollaborator;
+                    document.getElementById('finishTime').value = sample.finishTime;
+                } else {
+                    alert('Item não encontrado.');
+                }
+            }).catch(error => {
+                console.error('Erro ao carregar item:', error);
+            });
+
+            document.getElementById('editForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const formData = {
+                    inputData: document.getElementById('inputData').value,
+                    inspectionLot: document.getElementById('inspectionLot').value,
+                    plantNumber: document.getElementById('plantNumber').value,
+                    location: document.getElementById('location').value,
+                    material: document.getElementById('material').value,
+                    description: document.getElementById('description').value,
+                    quantity: document.getElementById('quantity').value,
+                    samplePlan: document.getElementById('samplePlan').value,
+                    status: document.getElementById('status').value,
+                    iqcCollaborator: document.getElementById('iqcCollaborator').value,
+                    finishTime: document.getElementById("status").value === 'Finalizado' ? now.toISOString().slice(0, 16) : null,
+                };
+
+                updateSample(parseInt(id), formData).then(() => {
+                    alert('Item atualizado com sucesso!');
+                    window.location.href = 'list.html';
+                }).catch(error => {
+                    console.error('Erro ao atualizar item:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
