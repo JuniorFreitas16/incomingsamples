@@ -9,10 +9,12 @@ app.use(cors());  // Allow requests from any origin
 
 // Create MySQL connection
 const db = mysql.createConnection({
-    host: '98.83.29.71',  // Your EC2 instance IP or domain
-    user: 'seda',         // MySQL user
+    host: '98.81.236.207',  // Your EC2 instance IP or domain
+    user: 'root',         // MySQL user
     password: 'Seda@2024',  // MySQL password
-    database: 'inspection_db' // Database name
+    database: 'inspection_db', // Database name
+    port: 3306, //porta MySql
+    connectTimeout: 10000 // 10 segundos de timeout
 });
 
 // Connect to MySQL
