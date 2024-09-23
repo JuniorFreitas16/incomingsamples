@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 // Create MySQL connection
 const db = mysql.createConnection({
-    host: '18.231.255.95',  // Your EC2 instance IP or domain
+    host: 'localhost',  // Your EC2 instance IP or domain
     user: 'seda',         // MySQL user
     password: 'Seda@2024',  // MySQL password
     database: 'inspection_db' // Database name
