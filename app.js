@@ -1,11 +1,11 @@
 const express = require('express');
 const mysql = require('mysql');
-const cors = require('cors');
+//const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());  // Allow requests from any origin
+//app.use(cors());  // Allow requests from any origin
 
 // Create MySQL connection
 const db = mysql.createConnection({
