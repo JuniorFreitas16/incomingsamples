@@ -12,9 +12,7 @@ const db = mysql.createConnection({
     host: '18.231.225.95',
     user: 'seda',
     password: 'Seda@2024',
-    database: 'inspection_db',
-    port: 3306,
-    connectTimeout: 10000
+    database: 'inspection_db'
 });
 
 db.connect(err => {
