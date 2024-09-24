@@ -116,10 +116,9 @@
                 .table{
                     width: 700px;
                     padding: 10px;
-                    transform: scale(0.3);
+                    overflow-x: auto; /* Permite rolagem horizontal */
                 }}
             
-
             .table {
                 justify-content: space-between;
                 width: 98%;
@@ -323,7 +322,7 @@
             }
 
             function editSample(id) {
-                window.location.href = `edit.html?id=${id}`;
+                window.location.href = `/edit.html?id=${id}`;
             }
 
             function exportToExcel(samples) {
@@ -429,7 +428,7 @@
                 
                 //Mostrar todas as linhas novamente
                 const rows=
-                document.querySelectorAll('listTableBody tr');
+                document.querySelectorAll('#listTableBody tr');
                 rows.forEach(row =>{
                     row.style.display = '';
                 });
