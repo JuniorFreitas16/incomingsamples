@@ -5,7 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Item - Output de Itens em QMLOT</title>
     <style>
-        /* O mesmo estilo do `index.html` pode ser utilizado aqui */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navigation {
+            margin-bottom: 20px;
+        }
+
+        .navigation a {
+            margin-right: 15px;
+            color: #0033a0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0033a0;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #0033a0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #002366;
+        }
     </style>
 </head>
 <body>
@@ -52,17 +114,15 @@
             <input type="text" id="iqcCollaborator" required>
 
             <label for="finishTime">Hora de Conclusão:</label>
-            <input type="datetime-local" id="finishTime" >
+            <input type="datetime-local" id="finishTime">
 
             <button type="submit">Salvar Alterações</button>
         </form>
     </div>
 
     <script>
-         // Configuração da data de Manaus
-         const now = new Date();
+        const now = new Date();
         now.setHours(now.getUTCHours() - 8);  // Ajuste para horário de Manaus
-        
         
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -73,15 +133,9 @@
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('QMLOT_DB', 1);
 
-                request.onsuccess = function(event) {
-                    resolve(event.target.result);
-                };
-
-                request.onerror = function(event) {
-                    reject(event.target.error);
-                };
-
-                request.onupgradeneeded = function(event) {
+                request.onsuccess = event => resolve(event.target.result);
+                request.onerror = event => reject(event.target.error);
+                request.onupgradeneeded = event => {
                     const db = event.target.result;
                     const objectStore = db.createObjectStore('samples', { keyPath: 'id', autoIncrement: true });
                     objectStore.createIndex('inputData', 'inputData', { unique: false });
@@ -94,7 +148,7 @@
                     objectStore.createIndex('samplePlan', 'samplePlan', { unique: false });
                     objectStore.createIndex('status', 'status', { unique: false });
                     objectStore.createIndex('iqcCollaborator', 'iqcCollaborator', { unique: false });
-                    objectStore.createIndex('finishTime', 'finishTime', { unique: false});
+                    objectStore.createIndex('finishTime', 'finishTime', { unique: false });
                 };
             });
         }
@@ -106,13 +160,8 @@
                     const objectStore = transaction.objectStore('samples');
                     const request = objectStore.get(id);
 
-                    request.onsuccess = function() {
-                        resolve(request.result);
-                    };
-
-                    request.onerror = function(event) {
-                        reject(event.target.error);
-                    };
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = event => reject(event.target.error);
                 });
             });
         }
@@ -124,13 +173,8 @@
                     const objectStore = transaction.objectStore('samples');
                     const request = objectStore.put({ id, ...data });
 
-                    request.onsuccess = function() {
-                        resolve();
-                    };
-
-                    request.onerror = function(event) {
-                        reject(event.target.error);
-                    };
+                    request.onsuccess = () => resolve();
+                    request.onerror = event => reject(event.target.error);
                 });
             });
         }
@@ -189,6 +233,5 @@
             });
         });
     </script>
-    <script src="app.js"></script>
 </body>
 </html>
