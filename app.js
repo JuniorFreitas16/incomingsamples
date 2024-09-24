@@ -1,23 +1,22 @@
 const express = require('express');
 const mysql = require('mysql');
-//const cors = require('cors');
+const cors = require('cors');
 const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 app.use(bodyParser.json());
-//app.use(cors());  // Allow requests from any origin
+app.use(cors());
 
-// Create MySQL connection
 const db = mysql.createConnection({
-    host: 'localhost',  // Your EC2 instance IP or domain
-    user: 'seda',         // MySQL user
-    password: 'Seda@2024',  // MySQL password
-    database: 'inspection_db' // Database name
-    //port: 3306, //porta MySql
-    //connectTimeout: 10000 // 10 segundos de timeout
+    host: '18.231.225.95',
+    user: 'seda',
+    password: 'Seda@2024',
+    database: 'inspection_db',
+    port: 3306,
+    connectTimeout: 10000
 });
 
-// Connect to MySQL
 db.connect(err => {
     if (err) {
         console.error('Error connecting to the database:', err.message);
@@ -26,41 +25,78 @@ db.connect(err => {
     console.log('MySQL Connected...');
 });
 
-// Endpoint to retrieve all inspection items
+// Endpoint para recuperar todos os itens de inspeção
 app.get('/items', (req, res) => {
     const sql = 'SELECT * FROM inspection_items';
     db.query(sql, (err, results) => {
         if (err) {
             console.error('Error retrieving items:', err.message);
-            res.status(500).json({ error: 'Error retrieving items' });
-            return;
+            return res.status(500).json({ error: 'Error retrieving items' });
         }
         res.json(results);
     });
 });
 
-// Endpoint to add a new inspection item
-app.post('/add-item', (req, res) => {
+// Endpoint para adicionar um novo item de inspeção
+app.post('/add-item', [
+    body('inputData').notEmpty().withMessage('Data e Hora de Envio é obrigatório.'),
+    body('inspectionLot').notEmpty().withMessage('Inspection Lot é obrigatório.'),
+    body('plantNumber').notEmpty().withMessage('Número da Planta é obrigatório.'),
+    body('location').notEmpty().withMessage('Locação é obrigatório.'),
+    body('material').notEmpty().withMessage('Material é obrigatório.'),
+    body('description').notEmpty().withMessage('Descrição é obrigatória.'),
+    body('quantity').isNumeric().withMessage('Quantidade do Lote deve ser um número.'),
+    body('samplePlan').optional().isNumeric().withMessage('Plano de Amostra deve ser um número.'),
+    body('status').notEmpty().withMessage('Status é obrigatório.'),
+    body('iqcCollaborator').notEmpty().withMessage('Colaborador IQC é obrigatório.')
+], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const item = req.body;
     const sql = 'INSERT INTO inspection_items SET ?';
     db.query(sql, item, (err, result) => {
         if (err) {
             console.error('Error adding item:', err.message);
-            res.status(500).json({ error: 'Error adding item' });
-            return;
+            return res.status(500).json({ error: 'Error adding item' });
         }
-        res.send('Item added successfully');
+        res.status(201).send('Item added successfully');
     });
 });
 
-// Endpoint to sync IndexedDB data
-app.post('/sync', (req, res) => {
-    const items = req.body.items; // Expecting an array of items from IndexedDB
+// Endpoint para atualizar um item de inspeção
+app.put('/update-item/:id', [
+    body('status').optional().notEmpty().withMessage('Status não pode estar vazio.'),
+    body('finishTime').optional().isISO8601().withMessage('FinishTime deve ser uma data válida.')
+], (req, res) => {
+    const { id } = req.params;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
-    // Insert each item into the database
+    const sql = 'UPDATE inspection_items SET ? WHERE id = ?';
+    db.query(sql, [req.body, id], (err, result) => {
+        if (err) {
+            console.error('Error updating item:', err.message);
+            return res.status(500).json({ error: 'Error updating item' });
+        }
+        res.send('Item updated successfully');
+    });
+});
+
+// Endpoint para sincronizar dados do IndexedDB
+app.post('/sync', (req, res) => {
+    const items = req.body.items;
+    if (!Array.isArray(items)) {
+        return res.status(400).json({ error: 'Items must be an array' });
+    }
+
     items.forEach(item => {
         const sql = 'INSERT INTO inspection_items SET ?';
-        db.query(sql, item, (err, result) => {
+        db.query(sql, item, (err) => {
             if (err) {
                 console.error('Error syncing item:', err.message);
             }
@@ -70,54 +106,7 @@ app.post('/sync', (req, res) => {
     res.send('Sync completed successfully');
 });
 
-// Endpoint to update the status of an inspection item, including finishTime handling
-app.post('/update-status/:id', (req, res) => {
-    const { status } = req.body;
-    const { id } = req.params;
-
-    // Query to get the current status of the item
-    const getStatusSql = 'SELECT status FROM inspection_items WHERE id = ?';
-    db.query(getStatusSql, [id], (err, result) => {
-        if (err) {
-            console.error('Error fetching status:', err.message);
-            return res.status(500).json({ error: 'Error fetching status' });
-        }
-
-        const currentStatus = result[0].status;
-
-        // Define valid transitions
-        const validTransitions = {
-            'Pending': ['In Progress', 'Rejected'],
-            'In Progress': ['Completed'],
-            'Completed': [],
-            'Rejected': []
-        };
-
-        // Check if the new status is valid
-        if (!validTransitions[currentStatus].includes(status)) {
-            return res.status(400).json({ error: `Invalid status transition from ${currentStatus} to ${status}` });
-        }
-
-        // Set finishTime if the new status is Completed or Rejected
-        let finishTime = null;
-        if (status === 'Completed' || status === 'Rejected') {
-            finishTime = new Date(); // Set finishTime to current date/time
-        }
-
-        // Update the status and finishTime in the database
-        const updateStatusSql = 'UPDATE inspection_items SET status = ?, finishTime = ? WHERE id = ?';
-        db.query(updateStatusSql, [status, finishTime, id], (err, result) => {
-            if (err) {
-                console.error('Error updating status:', err.message);
-                return res.status(500).json({ error: 'Error updating status' });
-            }
-
-            res.send('Status and finishTime updated successfully');
-        });
-    });
-});
-
-// Start the server
+// Inicie o servidor
 app.listen(3000, () => {
     console.log('Server started on port 3000');
 });
