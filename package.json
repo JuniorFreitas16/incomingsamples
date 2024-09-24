@@ -1,13 +1,27 @@
 {
-      "name": "incoming",
-      "version": "1.0.0",
-      "description": "",
-      "main": "app.js",
-      "scripts": {
-          "start": "node app.js"
-      },
-      "dependencies": {
-          "express": "^4.17.1",
-          "mysql": "^2.18.1"
-      }
+  "name": "incoming",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mysql": "^2.18.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuniorFreitas16/incomingsamples.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JuniorFreitas16/incomingsamples/issues"
+  },
+  "homepage": "https://github.com/JuniorFreitas16/incomingsamples#readme",
+  "devDependencies": {},
+  "description": ""
 }
