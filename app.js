@@ -12,7 +12,7 @@ const db = mysql.createConnection({
     host: 'http://18.231.225.95',  // Your EC2 instance IP or domain
     user: 'seda',         // MySQL user
     password: 'Seda@2024',  // MySQL password
-    database: 'inspection_db' // Database name
+    database: 'inspection_db', // Database name
     port: 3306, //porta MySql
     connectTimeout: 10000 // 10 segundos de timeout
 });
