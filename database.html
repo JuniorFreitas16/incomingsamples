@@ -41,7 +41,7 @@
     </table>
 
     <script>
-        fetch('http://18.231.225.95:3000/items')
+        fetch('/items')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById('tableBody');
