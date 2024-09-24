@@ -252,7 +252,7 @@
                     objectStore.add(item);
 
                     // Send to MySQL
-                    fetch('/add-item', {
+                    fetch('http://18.231.225.95/add-item', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
