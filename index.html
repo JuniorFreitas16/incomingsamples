@@ -168,7 +168,7 @@
 
             // Validação e adicionar ao IndexedDB
             openDatabase().then(db => {
-                const transaction = db.transaction(['inspection_db'], 'readwrite');
+                const transaction = db.transaction(['samples'], 'readwrite');
                 const objectStore = transaction.objectStore('samples');
                 const request = objectStore.add(formData);
 
