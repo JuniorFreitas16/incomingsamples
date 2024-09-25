@@ -6,6 +6,11 @@ const { body, validationResult } = require('express-validator');
 
 const app = express();
 app.use(bodyParser.json());
+const corsOptions = {
+    origin: 'https://juniorfreitas16.github.io',
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(cors());
 
 const db = mysql.createConnection({
