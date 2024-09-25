@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Output de Itens em QMLOT</title>
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
             color: #333;
@@ -118,20 +118,20 @@
             <label for="iqcCollaborator">Colaborador IQC:</label>
             <input type="text" id="iqcCollaborator" required>
 
+
             <button type="submit">Cadastrar</button>
         </form>
+        <div id="feedback" style="color: red;"></div>
     </div>
 
     <script>
         // Configuração da data de Manaus
         const now = new Date();
-        now.setHours(now.getUTCHours() - 8);  // Ajuste para horário de Manaus
+        now.setHours(now.getUTCHours() - 8);  
         document.getElementById('inputData').value = now.toISOString().slice(0, 16);
 
-        //document.getElementById('inputData').value = new Date().toISOString().slice(0, 16);
-
         document.getElementById('quantity').addEventListener('input', function() {
-            const quantity = parseInt(this.value);
+             const quantity = parseInt(this.value);
             let samplePlan;
 
             if (quantity <= 1200) {
@@ -147,18 +147,14 @@
             }
 
             document.getElementById('samplePlan').value = samplePlan;
+       
         });
 
         document.getElementById('itemForm').addEventListener('submit', function(event) {
             event.preventDefault();
-
-            if (Array.from(this.elements).some(input => input.required && !input.value)) {
-                alert('Por favor, preencha todos os campos obrigatórios.');
-                return;
-            }
-
             const formData = {
-                inputData: document.getElementById('inputData').value,
+
+		inputData: document.getElementById('inputData').value,
                 inspectionLot: document.getElementById('inspectionLot').value,
                 plantNumber: document.getElementById('plantNumber').value,
                 location: document.getElementById('location').value,
@@ -168,27 +164,43 @@
                 samplePlan: document.getElementById('samplePlan').value,
                 status: document.getElementById('status').value,
                 iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
-            };
+                finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null}; // Coletar dados do formulário
 
+            // Validação e adicionar ao IndexedDB
             openDatabase().then(db => {
                 const transaction = db.transaction(['samples'], 'readwrite');
                 const objectStore = transaction.objectStore('samples');
-                objectStore.add(formData);
+                const request = objectStore.add(formData);
 
-                transaction.oncomplete = function() {
-                    alert('Item cadastrado com sucesso!');
-                    document.getElementById('itemForm').reset();
+                request.onsuccess = function() {
+                    // Envio para MySQL
+                    fetch('http://18.231.225.95:3000/add-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Erro ao salvar no MySQL');
+                        return response.text();
+                    })
+                    .then(data => {
+                        alert('Item cadastrado com sucesso!');
+                        document.getElementById('itemForm').reset();
+                    })
+                    .catch(error => {
+                        document.getElementById('feedback').textContent = error.message;
+                        console.error('Erro:', error);
+                    });
                 };
 
                 transaction.onerror = function(event) {
-                    console.error('Erro ao cadastrar item:', event.target.error);
+                    document.getElementById('feedback').textContent = 'Erro ao cadastrar item no IndexedDB.';
                 };
             });
         });
 
         function openDatabase() {
-            return new Promise((resolve, reject) => {
+             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('QMLOT_DB', 1);
 
                 request.onsuccess = function(event) {
@@ -197,71 +209,7 @@
 
                 request.onerror = function(event) {
                     reject(event.target.error);
-                };
-
-                
-                
-                
-                
-                request.onupgradeneeded = function(event) {
-                    const db = event.target.result;
-                    const objectStore = db.createObjectStore('samples', { keyPath: 'id', autoIncrement: true });
-                    objectStore.createIndex('inputData', 'inputData', { unique: false });
-                    objectStore.createIndex('inspectionLot', 'inspectionLot', { unique: false });
-                    objectStore.createIndex('plantNumber', 'plantNumber', { unique: false });
-                    objectStore.createIndex('location', 'location', { unique: false });
-                    objectStore.createIndex('material', 'material', { unique: false });
-                    objectStore.createIndex('description', 'description', { unique: false });
-                    objectStore.createIndex('quantity', 'quantity', { unique: false });
-                    objectStore.createIndex('samplePlan', 'samplePlan', { unique: false });
-                    objectStore.createIndex('status', 'status', { unique: false });
-                    objectStore.createIndex('iqcCollaborator', 'iqcCollaborator', { unique: false });
-                };
-            });
         }
-                    let db;
-                    const request = indexedDB.open("inspection_db", 1);
-
-                    request.onupgradeneeded = function(event) {
-                        db = event.target.result;
-                        const objectStore = db.createObjectStore("inspectionItems", { keyPath: "id", autoIncrement: true });
-                        objectStore.createIndex("inputData", "inputData", { unique: false });
-                        objectStore.createIndex("inspectionLot", "inspectionLot", { unique: false });
-                        objectStore.createIndex("plantNumber", "plantNumber", { unique: false });
-                        objectStore.createIndex("location", "location", { unique: false });
-                        objectStore.createIndex("material", "material", { unique: false });
-                        objectStore.createIndex("description", "description", { unique: false });
-                        objectStore.createIndex("quantity", "quantity", { unique: false });
-                        objectStore.createIndex("samplePlan", "samplePlan", { unique: false });
-                        objectStore.createIndex("status", "status", { unique: false });
-                        objectStore.createIndex("iqcCollaborator", "iqcCollaborator", { unique: false });
-                    };
-
-                    request.onsuccess = function(event) {
-                        db = event.target.result;
-                    };
-
-                    request.onerror = function(event) {
-                        console.error("Database error: " + event.target.errorCode);
-                    };
-        
-        
-                    // Save to IndexedDB
-                    const transaction = db.transaction(["inspectionItems"], "readwrite");
-                    const objectStore = transaction.objectStore("inspectionItems");
-                    objectStore.add(item);
-
-                    // Send to MySQL
-                    fetch('18.231.225.95/add-item', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(item)
-                    }).then(response => response.text())
-                      .then(data => console.log(data))
-                      .catch(error => console.error('Error:', error));
     </script>
-    <script src="app.js"></script>
 </body>
 </html>
