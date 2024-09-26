@@ -5,9 +5,9 @@ const port = 3000;
 
 // Conectar ao MySQL
 const connection = mysql.createConnection({
-    host: 'localhost',   // Endereço do servidor MySQL
-    user: 'seda',        // Usuário do MySQL
-    password: 'Seda@2024',// Senha do MySQL
+    host: '18.231.225.95',   // Endereço do servidor MySQL
+    user: 'root',        // Usuário do MySQL
+    password: '',// Senha do MySQL
     database: 'qmlot_db' // Nome do banco de dados
 });
 
