@@ -3,15 +3,16 @@ const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { body, validationResult } = require('express-validator');
+const helmet = require('helmet');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(helmet());
 const corsOptions = {
     origin: 'https://juniorfreitas16.github.io',
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-app.use(cors());
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -23,7 +24,7 @@ const db = mysql.createConnection({
 db.connect(err => {
     if (err) {
         console.error('Error connecting to the database:', err.message);
-        return;
+        process.exit(1);
     }
     console.log('MySQL Connected...');
 });
@@ -97,14 +98,20 @@ app.post('/sync', (req, res) => {
         return res.status(400).json({ error: 'Items must be an array' });
     }
 
+    const errors = [];
     items.forEach(item => {
         const sql = 'INSERT INTO inspection_items SET ?';
         db.query(sql, item, (err) => {
             if (err) {
                 console.error('Error syncing item:', err.message);
+                errors.push({ item, error: err.message });
             }
         });
     });
+
+    if (errors.length) {
+        return res.status(500).json({ error: 'Some items failed to sync', details: errors });
+    }
 
     res.send('Sync completed successfully');
 });
