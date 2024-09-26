@@ -1,122 +1,120 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const { body, validationResult } = require('express-validator');
-const helmet = require('helmet');
-
 const app = express();
-app.use(bodyParser.json());
-app.use(helmet());
-const corsOptions = {
-    origin: 'https://juniorfreitas16.github.io',
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+const port = 3000;
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'seda',
-    password: 'Seda@2024',
-    database: 'inspection_db'
+// Conectar ao MySQL
+const connection = mysql.createConnection({
+    host: 'localhost',   // Endereço do servidor MySQL
+    user: 'seda',        // Usuário do MySQL
+    password: 'Seda@2024',// Senha do MySQL
+    database: 'qmlot_db' // Nome do banco de dados
 });
 
-db.connect(err => {
+connection.connect((err) => {
     if (err) {
-        console.error('Error connecting to the database:', err.message);
-        process.exit(1);
+        console.error('Erro ao conectar ao banco de dados:', err);
+        return;
     }
-    console.log('MySQL Connected...');
+    console.log('Conectado ao MySQL');
 });
 
-// Endpoint para recuperar todos os itens de inspeção
-app.get('/items', (req, res) => {
-    const sql = 'SELECT * FROM inspection_items';
-    db.query(sql, (err, results) => {
+// Middleware para parsing de JSON
+app.use(express.json());
+
+// Rota para buscar todas as amostras (samples)
+app.get('/api/samples', (req, res) => {
+    const query = 'SELECT * FROM samples';
+    connection.query(query, (err, results) => {
         if (err) {
-            console.error('Error retrieving items:', err.message);
-            return res.status(500).json({ error: 'Error retrieving items' });
+            res.status(500).send('Erro ao buscar os dados.');
+        } else {
+            res.json(results);
         }
-        res.json(results);
     });
 });
 
-// Endpoint para adicionar um novo item de inspeção
-app.post('/add-item', [
-    body('inputData').notEmpty().withMessage('Data e Hora de Envio é obrigatório.'),
-    body('inspectionLot').notEmpty().withMessage('Inspection Lot é obrigatório.'),
-    body('plantNumber').notEmpty().withMessage('Número da Planta é obrigatório.'),
-    body('location').notEmpty().withMessage('Locação é obrigatório.'),
-    body('material').notEmpty().withMessage('Material é obrigatório.'),
-    body('description').notEmpty().withMessage('Descrição é obrigatória.'),
-    body('quantity').isNumeric().withMessage('Quantidade do Lote deve ser um número.'),
-    body('samplePlan').optional().isNumeric().withMessage('Plano de Amostra deve ser um número.'),
-    body('status').notEmpty().withMessage('Status é obrigatório.'),
-    body('iqcCollaborator').notEmpty().withMessage('Colaborador IQC é obrigatório.')
-], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+// Rota para adicionar uma nova amostra
+app.post('/api/samples', (req, res) => {
+    const newSample = req.body;
+    const query = 'INSERT INTO samples (inputData, inspectionLot, plantNumber, location, material, description, quantity, samplePlan, status, iqcCollaborator, finishTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-    const item = req.body;
-    const sql = 'INSERT INTO inspection_items SET ?';
-    db.query(sql, item, (err, result) => {
+    connection.query(query, [
+        newSample.inputData, 
+        newSample.inspectionLot, 
+        newSample.plantNumber, 
+        newSample.location, 
+        newSample.material, 
+        newSample.description, 
+        newSample.quantity, 
+        newSample.samplePlan, 
+        newSample.status, 
+        newSample.iqcCollaborator, 
+        newSample.finishTime
+    ], (err, result) => {
         if (err) {
-            console.error('Error adding item:', err.message);
-            return res.status(500).json({ error: 'Error adding item' });
+            res.status(500).send('Erro ao adicionar amostra.');
+        } else {
+            res.status(201).send('Amostra adicionada com sucesso!');
         }
-        res.status(201).send('Item added successfully');
     });
 });
 
-// Endpoint para atualizar um item de inspeção
-app.put('/update-item/:id', [
-    body('status').optional().notEmpty().withMessage('Status não pode estar vazio.'),
-    body('finishTime').optional().isISO8601().withMessage('FinishTime deve ser uma data válida.')
-], (req, res) => {
-    const { id } = req.params;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+// Rota para deletar uma amostra por ID
+app.delete('/api/samples/:id', (req, res) => {
+    const sampleId = req.params.id;
+    const query = 'DELETE FROM samples WHERE id = ?';
 
-    const sql = 'UPDATE inspection_items SET ? WHERE id = ?';
-    db.query(sql, [req.body, id], (err, result) => {
+    connection.query(query, [sampleId], (err, result) => {
         if (err) {
-            console.error('Error updating item:', err.message);
-            return res.status(500).json({ error: 'Error updating item' });
+            res.status(500).send('Erro ao deletar a amostra.');
+        } else {
+            res.send('Amostra deletada com sucesso!');
         }
-        res.send('Item updated successfully');
     });
 });
 
-// Endpoint para sincronizar dados do IndexedDB
-/*app.post('/sync', (req, res) => {
-    const items = req.body.items;
-    if (!Array.isArray(items)) {
-        return res.status(400).json({ error: 'Items must be an array' });
-    }
+// Rota para atualizar uma amostra por ID
+app.put('/api/samples/:id', (req, res) => {
+    const sampleId = req.params.id;
+    const updatedSample = req.body;
+    const query = `UPDATE samples SET 
+        inputData = ?, 
+        inspectionLot = ?, 
+        plantNumber = ?, 
+        location = ?, 
+        material = ?, 
+        description = ?, 
+        quantity = ?, 
+        samplePlan = ?, 
+        status = ?, 
+        iqcCollaborator = ?, 
+        finishTime = ? 
+        WHERE id = ?`;
 
-    const errors = [];
-    items.forEach(item => {
-        const sql = 'INSERT INTO inspection_items SET ?';
-        db.query(sql, item, (err) => {
-            if (err) {
-                console.error('Error syncing item:', err.message);
-                errors.push({ item, error: err.message });
-            }
-        });
+    connection.query(query, [
+        updatedSample.inputData, 
+        updatedSample.inspectionLot, 
+        updatedSample.plantNumber, 
+        updatedSample.location, 
+        updatedSample.material, 
+        updatedSample.description, 
+        updatedSample.quantity, 
+        updatedSample.samplePlan, 
+        updatedSample.status, 
+        updatedSample.iqcCollaborator, 
+        updatedSample.finishTime,
+        sampleId
+    ], (err, result) => {
+        if (err) {
+            res.status(500).send('Erro ao atualizar amostra.');
+        } else {
+            res.send('Amostra atualizada com sucesso!');
+        }
     });
+});
 
-    if (errors.length) {
-        return res.status(500).json({ error: 'Some items failed to sync', details: errors });
-    }
-
-    res.send('Sync completed successfully');
-});*/
-
-// Inicie o servidor
-app.listen(3000, () => {
-    console.log('Server started on port 3000');
+// Iniciar o servidor
+app.listen(port, () => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
 });
