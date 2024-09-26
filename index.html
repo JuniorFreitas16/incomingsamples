@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Output de Itens em QMLOT</title>
     <style>
-                body {
+        body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
             color: #333;
@@ -51,19 +51,13 @@
         }
 
         .navigation {
-        padding: 20px;
-        background-color: #0033a0;
-        color: white;
-        text-align: left;
+            padding: 20px;
+            background-color: #0033a0;
+            color: white;
+            text-align: left;
         }
 
-        /*.navigation {
-            text-align: left;
-            margin-bottom: 20px;
-        }*/
-
         .navigation a {
-            /*color: #0033a0; /* Royal Blue */
             color: #ffffff;
             text-decoration: none;
             font-weight: bold;
@@ -118,7 +112,6 @@
             <label for="iqcCollaborator">Colaborador IQC:</label>
             <input type="text" id="iqcCollaborator" required>
 
-
             <button type="submit">Cadastrar</button>
         </form>
         <div id="feedback" style="color: red;"></div>
@@ -131,7 +124,7 @@
         document.getElementById('inputData').value = now.toISOString().slice(0, 16);
 
         document.getElementById('quantity').addEventListener('input', function() {
-             const quantity = parseInt(this.value);
+            const quantity = parseInt(this.value);
             let samplePlan;
 
             if (quantity <= 1200) {
@@ -147,14 +140,12 @@
             }
 
             document.getElementById('samplePlan').value = samplePlan;
-       
         });
 
         document.getElementById('itemForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = {
-
-		inputData: document.getElementById('inputData').value,
+                inputData: document.getElementById('inputData').value,
                 inspectionLot: document.getElementById('inspectionLot').value,
                 plantNumber: document.getElementById('plantNumber').value,
                 location: document.getElementById('location').value,
@@ -164,53 +155,28 @@
                 samplePlan: document.getElementById('samplePlan').value,
                 status: document.getElementById('status').value,
                 iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null}; // Coletar dados do formulário
+                finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null
+            };
 
-            // Validação e adicionar ao IndexedDB
-            openDatabase().then(db => {
-                const transaction = db.transaction(['samples'], 'readwrite');
-                const objectStore = transaction.objectStore('samples');
-                const request = objectStore.add(formData);
-
-                request.onsuccess = function() {
-                    // Envio para MySQL
-                    fetch('https://18.231.225.95/add-item', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(formData)
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Erro ao salvar no MySQL');
-                        return response.text();
-                    })
-                    .then(data => {
-                        alert('Item cadastrado com sucesso!');
-                        document.getElementById('itemForm').reset();
-                    })
-                    .catch(error => {
-                        document.getElementById('feedback').textContent = error.message;
-                        console.error('Erro:', error);
-                    });
-                };
-
-                transaction.onerror = function(event) {
-                    document.getElementById('feedback').textContent = 'Erro ao cadastrar item no IndexedDB.';
-                };
+            // Envio direto para o MySQL
+            fetch('https://18.231.225.95/add-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao salvar no MySQL');
+                return response.text();
+            })
+            .then(data => {
+                alert('Item cadastrado com sucesso!');
+                document.getElementById('itemForm').reset();
+            })
+            .catch(error => {
+                document.getElementById('feedback').textContent = error.message;
+                console.error('Erro:', error);
             });
         });
-
-        function openDatabase() {
-             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('QMLOT_DB', 1);
-
-                request.onsuccess = function(event) {
-                    resolve(event.target.result);
-                };
-
-                request.onerror = function(event) {
-                    reject(event.target.error);
-        };
-	     });}
     </script>
 </body>
 </html>
