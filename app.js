@@ -92,7 +92,7 @@ app.put('/update-item/:id', [
 });
 
 // Endpoint para sincronizar dados do IndexedDB
-app.post('/sync', (req, res) => {
+/*app.post('/sync', (req, res) => {
     const items = req.body.items;
     if (!Array.isArray(items)) {
         return res.status(400).json({ error: 'Items must be an array' });
@@ -114,7 +114,7 @@ app.post('/sync', (req, res) => {
     }
 
     res.send('Sync completed successfully');
-});
+});*/
 
 // Inicie o servidor
 app.listen(3000, () => {
