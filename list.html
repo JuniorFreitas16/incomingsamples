@@ -239,7 +239,7 @@
     <script>
         async function fetchSamples() {
             try {
-                const response = await fetch('/incomingsamples/samples');
+                const response = await fetch('/api/samples');
                 const samples = await response.json();
                 updateTable(samples);
             } catch (error) {
@@ -289,7 +289,7 @@
 
         async function deleteSample(id) {
             try {
-                await fetch(`/incomingsamples/samples/${id}`, { method: 'DELETE' });
+                await fetch(`/api/samples/${id}`, { method: 'DELETE' });
                 alert('Item excluído com sucesso!');
                 fetchSamples(); // Atualiza a tabela após excluir
             } catch (error) {
@@ -369,6 +369,6 @@
             });
         }
     </script>
-    <script src="app.js"></script>
+    //<script src="app.js"></script>
 </body>
 </html>
