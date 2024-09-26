@@ -159,7 +159,7 @@
             };
 
             // Envio direto para o MySQL
-            fetch('/incomingsamples/samples', {
+            fetch('/api/samples', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
