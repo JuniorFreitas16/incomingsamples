@@ -206,7 +206,7 @@
     }
 
     function loadSamples() {
-        return fetch('http://localhost/samples')
+        return fetch('http://52.67.36.220/samples')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados do servidor');
