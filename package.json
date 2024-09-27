@@ -1,5 +1,5 @@
 {
-  "name": "inspections-api",
+  "name": "incoming",
   "version": "1.0.0",
   "description": "API para gerenciamento de inspeções com MySQL e Express",
   "main": "app.js",
