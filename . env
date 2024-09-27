@@ -1,0 +1,5 @@
+DB_HOST=52.67.36.220 
+DB_USER=seda
+DB_PASSWORD=Seda@2024
+DB_NAME=inspection_db
+PORT=3000
