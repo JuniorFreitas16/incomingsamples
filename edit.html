@@ -121,62 +121,9 @@
     </div>
 
     <script>
-        const now = new Date();
-        now.setHours(now.getUTCHours() - 8);  // Ajuste para horário de Manaus
-        
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
-        }
-
-        function openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('QMLOT_DB', 1);
-
-                request.onsuccess = event => resolve(event.target.result);
-                request.onerror = event => reject(event.target.error);
-                request.onupgradeneeded = event => {
-                    const db = event.target.result;
-                    const objectStore = db.createObjectStore('samples', { keyPath: 'id', autoIncrement: true });
-                    objectStore.createIndex('inputData', 'inputData', { unique: false });
-                    objectStore.createIndex('inspectionLot', 'inspectionLot', { unique: false });
-                    objectStore.createIndex('plantNumber', 'plantNumber', { unique: false });
-                    objectStore.createIndex('location', 'location', { unique: false });
-                    objectStore.createIndex('material', 'material', { unique: false });
-                    objectStore.createIndex('description', 'description', { unique: false });
-                    objectStore.createIndex('quantity', 'quantity', { unique: false });
-                    objectStore.createIndex('samplePlan', 'samplePlan', { unique: false });
-                    objectStore.createIndex('status', 'status', { unique: false });
-                    objectStore.createIndex('iqcCollaborator', 'iqcCollaborator', { unique: false });
-                    objectStore.createIndex('finishTime', 'finishTime', { unique: false });
-                };
-            });
-        }
-
-        function loadSample(id) {
-            return openDatabase().then(db => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(['samples'], 'readonly');
-                    const objectStore = transaction.objectStore('samples');
-                    const request = objectStore.get(id);
-
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = event => reject(event.target.error);
-                });
-            });
-        }
-
-        function updateSample(id, data) {
-            return openDatabase().then(db => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(['samples'], 'readwrite');
-                    const objectStore = transaction.objectStore('samples');
-                    const request = objectStore.put({ id, ...data });
-
-                    request.onsuccess = () => resolve();
-                    request.onerror = event => reject(event.target.error);
-                });
-            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -187,25 +134,29 @@
                 return;
             }
 
-            loadSample(parseInt(id)).then(sample => {
-                if (sample) {
-                    document.getElementById('inputData').value = sample.inputData;
-                    document.getElementById('inspectionLot').value = sample.inspectionLot;
-                    document.getElementById('plantNumber').value = sample.plantNumber;
-                    document.getElementById('location').value = sample.location;
-                    document.getElementById('material').value = sample.material;
-                    document.getElementById('description').value = sample.description;
-                    document.getElementById('quantity').value = sample.quantity;
-                    document.getElementById('samplePlan').value = sample.samplePlan;
-                    document.getElementById('status').value = sample.status;
-                    document.getElementById('iqcCollaborator').value = sample.iqcCollaborator;
-                    document.getElementById('finishTime').value = sample.finishTime;
-                } else {
-                    alert('Item não encontrado.');
-                }
-            }).catch(error => {
-                console.error('Erro ao carregar item:', error);
-            });
+            // Carregar o item usando AJAX
+            fetch(`http://localhost:3000/load_item?id=${id}`)
+                .then(response => response.json())
+                .then(sample => {
+                    if (sample) {
+                        document.getElementById('inputData').value = sample.inputData;
+                        document.getElementById('inspectionLot').value = sample.inspectionLot;
+                        document.getElementById('plantNumber').value = sample.plantNumber;
+                        document.getElementById('location').value = sample.location;
+                        document.getElementById('material').value = sample.material;
+                        document.getElementById('description').value = sample.description;
+                        document.getElementById('quantity').value = sample.quantity;
+                        document.getElementById('samplePlan').value = sample.samplePlan;
+                        document.getElementById('status').value = sample.status;
+                        document.getElementById('iqcCollaborator').value = sample.iqcCollaborator;
+                        document.getElementById('finishTime').value = sample.finishTime;
+                    } else {
+                        alert('Item não encontrado.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar item:', error);
+                });
 
             document.getElementById('editForm').addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -221,13 +172,27 @@
                     samplePlan: document.getElementById('samplePlan').value,
                     status: document.getElementById('status').value,
                     iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                    finishTime: document.getElementById("status").value === 'Finalizado' ? now.toISOString().slice(0, 16) : null,
+                    finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
                 };
 
-                updateSample(parseInt(id), formData).then(() => {
-                    alert('Item atualizado com sucesso!');
-                    window.location.href = 'list.html';
-                }).catch(error => {
+                // Enviar os dados para o Node.js
+                fetch(`http://localhost:3000/sample/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Item atualizado com sucesso!');
+                        window.location.href = 'list.html';
+                    } else {
+                        alert('Erro ao atualizar item: ' + data.message);
+                    }
+                })
+                .catch(error => {
                     console.error('Erro ao atualizar item:', error);
                 });
             });
