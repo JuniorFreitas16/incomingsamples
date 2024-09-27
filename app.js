@@ -20,7 +20,7 @@ const pool = mysql.createPool({
 //const corsOptions = {
 //    origin: 'https://juniorfreitas16.github.io',
 //    optionsSuccessStatus: 200
-};
+//};
 //app.use(cors(corsOptions));
 app.use (cors());
 
