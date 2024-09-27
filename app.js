@@ -7,9 +7,9 @@ const port = 3000;
 // Conectar ao MySQL usando variáveis de ambiente
 const connection = mysql.createConnection({
     host: process.env.DB_HOST || '18.231.225.95',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'qmlot_db'
+    user: process.env.DB_USER || 'seda',
+    password: process.env.DB_PASSWORD || 'Seda@2024',
+    database: process.env.DB_NAME || 'inspection_db'
 });
 
 connection.connect((err) => {
@@ -25,7 +25,7 @@ app.use(express.json());
 
 // Rota para buscar todas as amostras (samples)
 app.get('/api/samples', (req, res) => {
-    const query = 'SELECT * FROM samples';
+    const query = 'SELECT * FROM inspection_items';
     connection.query(query, (err, results) => {
         if (err) {
             console.error('Erro ao buscar os dados:', err);
@@ -44,7 +44,7 @@ app.post('/api/samples', (req, res) => {
         return res.status(400).send('Dados inválidos.');
     }
 
-    const query = `INSERT INTO samples (inputData, inspectionLot, plantNumber, location, material, description, quantity, samplePlan, status, iqcCollaborator, finishTime) 
+    const query = `INSERT INTO inspection_items (inputData, inspectionLot, plantNumber, location, material, description, quantity, samplePlan, status, iqcCollaborator, finishTime) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     connection.query(query, [
@@ -72,7 +72,7 @@ app.post('/api/samples', (req, res) => {
 // Rota para deletar uma amostra por ID
 app.delete('/api/samples/:id', (req, res) => {
     const sampleId = req.params.id;
-    const query = 'DELETE FROM samples WHERE id = ?';
+    const query = 'DELETE FROM inspection_items WHERE id = ?';
 
     connection.query(query, [sampleId], (err, result) => {
         if (err) {
@@ -95,7 +95,7 @@ app.put('/api/samples/:id', (req, res) => {
         return res.status(400).send('Dados inválidos.');
     }
 
-    const query = `UPDATE samples SET 
+    const query = `UPDATE inspection_items SET 
         inputData = ?, 
         inspectionLot = ?, 
         plantNumber = ?, 
