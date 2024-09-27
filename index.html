@@ -22,7 +22,7 @@
 
         h1 {
             text-align: center;
-            color: #0033a0; /* Royal Blue */
+            color: #0033a0;
         }
 
         label {
@@ -40,7 +40,7 @@
         }
 
         button {
-            background-color: #0033a0; /* Royal Blue */
+            background-color: #0033a0;
             color: white;
             cursor: pointer;
             border: none;
@@ -120,7 +120,7 @@
     <script>
         // Configuração da data de Manaus
         const now = new Date();
-        now.setHours(now.getUTCHours() - 8);  
+        now.setHours(now.getUTCHours() - 4);  // Ajustar para o fuso horário de Manaus
         document.getElementById('inputData').value = now.toISOString().slice(0, 16);
 
         document.getElementById('quantity').addEventListener('input', function() {
@@ -154,12 +154,16 @@
                 quantity: document.getElementById('quantity').value,
                 samplePlan: document.getElementById('samplePlan').value,
                 status: document.getElementById('status').value,
-                iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : undefined
+                iqcCollaboratoriqcCollaborator: document.getElementById('iqcCollaborator').value
             };
 
-            // Envio direto para o MySQL
-            fetch('18.231.225.95:3000/samples', {
+            // Adicionar o campo finishTime apenas se o status for "Finalizado"
+            if (document.getElementById('status').value === 'Finalizado') {
+                formData.finishTime = new Date().toISOString().slice(0, 16);
+            }
+
+            // Enviar os dados para a API
+            fetch('http://18.231.225.95:3000/samples', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -170,11 +174,10 @@
             })
             .then(data => {
                 alert('Item cadastrado com sucesso!');
-                document.getElementById('feedback').textContent = ''; // Limpar mensagens de erro
-                document.getElementById('itemForm').reset();
+                document.getElementById('feedback').textContent = ''; // Limpar mensagens de errodocument.getElementById('itemForm').reset(); // Resetar o formulário após o sucesso
             })
             .catch(error => {
-                document.getElementById('feedback').textContent = error.message;
+                document.getElementById('feedback').textContent = error.message; // Mostrar o erro ao usuário
                 console.error('Erro:', error);
             });
         });
