@@ -156,5 +156,5 @@ process.on('SIGINT', () => {
 
 // Iniciar o servidor
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando em http://18.67.36.220:${port}`);
 });
