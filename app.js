@@ -24,7 +24,7 @@ connection.connect((err) => {
 app.use(express.json());
 
 // Rota para buscar todas as amostras (samples)
-app.get('/api/samples', (req, res) => {
+app.get('/samples', (req, res) => {
     const query = 'SELECT * FROM inspection_items';
     connection.query(query, (err, results) => {
         if (err) {
@@ -37,7 +37,7 @@ app.get('/api/samples', (req, res) => {
 });
 
 // Rota para adicionar uma nova amostra
-app.post('/api/samples', (req, res) => {
+app.post('/samples', (req, res) => {
     const newSample = req.body;
 
     if (!newSample || Object.keys(newSample).length === 0) {
@@ -70,7 +70,7 @@ app.post('/api/samples', (req, res) => {
 });
 
 // Rota para deletar uma amostra por ID
-app.delete('/api/samples/:id', (req, res) => {
+app.delete('/samples/:id', (req, res) => {
     const sampleId = req.params.id;
     const query = 'DELETE FROM inspection_items WHERE id = ?';
 
@@ -87,7 +87,7 @@ app.delete('/api/samples/:id', (req, res) => {
 });
 
 // Rota para atualizar uma amostra por ID
-app.put('/api/samples/:id', (req, res) => {
+app.put('/samples/:id', (req, res) => {
     const sampleId = req.params.id;
     const updatedSample = req.body;
 
