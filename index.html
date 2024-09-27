@@ -155,7 +155,7 @@
                 samplePlan: document.getElementById('samplePlan').value,
                 status: document.getElementById('status').value,
                 iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null
+                finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : undefined
             };
 
             // Envio direto para o MySQL
@@ -170,6 +170,7 @@
             })
             .then(data => {
                 alert('Item cadastrado com sucesso!');
+                document.getElementById('feedback').textContent = ''; // Limpar mensagens de erro
                 document.getElementById('itemForm').reset();
             })
             .catch(error => {
@@ -178,6 +179,5 @@
             });
         });
     </script>
-   // <script src="app.js"></script>
 </body>
 </html>
