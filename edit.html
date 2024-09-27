@@ -135,7 +135,7 @@
             }
 
             // Carregar o item usando AJAX
-            fetch(`http://localhost:3000/load_item?id=${id}`)
+            fetch(`http://52.67.36.220/load_item?id=${id}`)
                 .then(response => response.json())
                 .then(sample => {
                     if (sample) {
@@ -176,7 +176,7 @@
                 };
 
                 // Enviar os dados para o Node.js
-                fetch(`http://localhost:3000/sample/${id}`, {
+                fetch(`http://52.67.36.220/sample/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
