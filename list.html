@@ -289,7 +289,7 @@
 
         async function deleteSample(id) {
             try {
-                await fetch(`http://localhost/samples/${id}`, { method: 'DELETE' });
+                await fetch(`http://52.67.36.220/samples/${id}`, { method: 'DELETE' });
                 alert('Item excluído com sucesso!');
                 fetchSamples(); // Atualiza a tabela após excluir
             } catch (error) {
