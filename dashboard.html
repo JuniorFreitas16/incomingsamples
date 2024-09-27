@@ -249,157 +249,71 @@
     </div>
 
     <script>
-        function openDatabase() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('QMLOT_DB', 1);
-
-                request.onsuccess = function(event) {
-                    resolve(event.target.result);
-                };
-
-                request.onerror = function(event) {
-                    reject(event.target.error);
-                };
-            });
-        }
-
-        function loadSamples() {
-            return openDatabase().then(db => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction(['samples'], 'readonly');
-                    const objectStore = transaction.objectStore('samples');
-                    const request = objectStore.getAll();
-
-                    request.onsuccess = function() {
-                        resolve(request.result);
-                    };
-
-                    request.onerror = function(event) {
-                        reject(event.target.error);
-                    };
-                });
-            });
-        }
-
-        function updateDashboard(samples) {
-            let totalSamples = 0;
-            let inProgressSamples = 0;
-            let pendingItems = 0;
-            let completedSamples = 0;
-            let samplePlanInProgress = 0;
-            let samplePlanCompleted = 0;
-            let allSamples = samplePlanInProgress + samplePlanCompleted;
-
-            const dashboardTableBody = document.getElementById('dashboardTableBody');
-            dashboardTableBody.innerHTML = '';
-
-            samples.forEach(sample => {
-                totalSamples += 1;
-
-                // Contar status
-                if (sample.status === 'Em Processo de Inspeção') {
-                    inProgressSamples += 1;
-                    samplePlanInProgress += parseInt(sample.samplePlan) || 0;
-                } else if (sample.status === 'Pendente de Inspeção') {
-                    pendingItems += 1;
-                } else if (sample.status === 'Finalizado') {
-                    completedSamples += 1;
-                    samplePlanCompleted += parseInt(sample.samplePlan) || 0;
+    function loadSamples() {
+        return fetch('/api/samples')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar os dados do servidor');
                 }
-
-                
- 
-                
-                //Gráficos
-            JSC.Chart('chartDiv', {
-            box: {
-            padding: 10,
-            radius: 5,
-            fill: '#e5f6ff'},
-            palette: ['#4169E1', '#FF0000', '#00FA9A'],
-            title: {
-            label_text: 'Inspeções',
-            position: 'center',
-            },
-            legend_visible: false,
-            defaultSeries: {
-            type: 'pie donut',
-            angle_orientation: 125,
-            shape_padding: 2,
-            mouseTracking_enabled: true
-            },
-            defaultPoint: {
-            label: {
-            text: '%name : %yValue',
-            margin: 10
-            }},
-            series: [
-            {
-            points: [
-            {x: 'Em andamento', y: inProgressSamples},
-            {x: 'Pendentes', y: pendingItems},
-            {x: 'Finalizados', y: completedSamples}
-            ]
-            }
-            ]
-            });
-
-            JSC.Chart('chartDiv2', {
-            box: {
-            padding: 10,
-            radius: 5,
-            fill: '#e5f6ff'},
-            type: 'column',
-            title_label_text: 'Amostras',
-            title_position: 'center', 
-            legend_visible: false, 
-            defaultPoint: {
-            label: {
-            text: '{%yValue:n1}%',
-            margin: 10
-            }},
-            series: [
-            {
-            points: [
-            {x: 'Em inspeção', y: (samplePlanInProgress/(samplePlanCompleted+samplePlanInProgress))*100 },
-            {x: 'Liberadas', y: (samplePlanCompleted/(samplePlanCompleted+samplePlanInProgress))*100  }
-            ]
-            }
-            ]
-            });
-
-                // Preencher tabela
-                const row = dashboardTableBody.insertRow();
-                row.insertCell(0).textContent = sample.inputData;
-                row.insertCell(1).textContent = sample.inspectionLot;
-                row.insertCell(2).textContent = sample.plantNumber;
-                row.insertCell(3).textContent = sample.location;
-                row.insertCell(4).textContent = sample.material;
-                row.insertCell(5).textContent = sample.description;
-                row.insertCell(6).textContent = sample.quantity;
-                row.insertCell(7).textContent = sample.samplePlan;
-                row.insertCell(8).textContent = sample.status;
-                row.insertCell(9).textContent = sample.iqcCollaborator;
-                row.insertCell(10).textContent = sample.finishTime;
-            });
-
-            // Atualizar os valores do dashboard
-            document.getElementById('totalSamples').textContent = totalSamples;
-            document.getElementById('inProgressSamples').textContent = inProgressSamples;
-            document.getElementById('pendingItems').textContent = pendingItems;
-            document.getElementById('completedSamples').textContent = completedSamples;
-            document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
-            document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSamples().then(samples => updateDashboard(samples)).catch(error => {
+                return response.json();
+            })
+            .then(samples => {
+                updateDashboard(samples);
+            })
+            .catch(error => {
                 console.error('Erro ao carregar dados:', error);
-            });  
-        });
-    
+            });
+    }
 
-    
+    function updateDashboard(samples) {
+        let totalSamples = 0;
+        let inProgressSamples = 0;
+        let pendingItems = 0;
+        let completedSamples = 0;
+        let samplePlanInProgress = 0;
+        let samplePlanCompleted = 0;
+        
+        const dashboardTableBody = document.getElementById('dashboardTableBody');
+        dashboardTableBody.innerHTML = '';
+
+        samples.forEach(sample => {
+            totalSamples += 1;
+
+            if (sample.status === 'Em Processo de Inspeção') {
+                inProgressSamples += 1;
+                samplePlanInProgress += parseInt(sample.samplePlan) || 0;
+            } else if (sample.status === 'Pendente de Inspeção') {
+                pendingItems += 1;
+            } else if (sample.status === 'Finalizado') {
+                completedSamples += 1;
+                samplePlanCompleted += parseInt(sample.samplePlan) || 0;
+            }
+
+            const row = dashboardTableBody.insertRow();
+            row.insertCell(0).textContent = sample.inputData;
+            row.insertCell(1).textContent = sample.inspectionLot;
+            row.insertCell(2).textContent = sample.plantNumber;
+            row.insertCell(3).textContent = sample.location;
+            row.insertCell(4).textContent = sample.material;
+            row.insertCell(5).textContent = sample.description;
+            row.insertCell(6).textContent = sample.quantity;
+            row.insertCell(7).textContent = sample.samplePlan;
+            row.insertCell(8).textContent = sample.status;
+            row.insertCell(9).textContent = sample.iqcCollaborator;
+            row.insertCell(10).textContent = sample.finishTime;
+        });
+
+        document.getElementById('totalSamples').textContent = totalSamples;
+        document.getElementById('inProgressSamples').textContent = inProgressSamples;
+        document.getElementById('pendingItems').textContent = pendingItems;
+        document.getElementById('completedSamples').textContent = completedSamples;
+        document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
+        document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSamples();
+    });   
     </script>
 
 </body>
