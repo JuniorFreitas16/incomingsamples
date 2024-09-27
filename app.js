@@ -1,38 +1,42 @@
-require('dotenv').config(); // Para usar variáveis de ambiente
+require('dotenv').config(); // Carregar variáveis de ambiente
 const mysql = require('mysql2');
 const express = require('express');
+const cors = require('cors'); // Adicionando CORS
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Porta definida via variável de ambiente
 
-// Conectar ao MySQL usando variáveis de ambiente
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST || '18.231.225.95',
-    user: process.env.DB_USER || 'seda',
-    password: process.env.DB_PASSWORD || 'Seda@2024',
-    database: process.env.DB_NAME || 'inspection_db'
+// Configuração do pool de conexões MySQL
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10, // Limite de conexões no pool
+    queueLimit: 0
 });
 
-connection.connect((err) => {
-    if (err) {
-        console.error('Erro ao conectar ao banco de dados:', err);
-        return;
-    }
-    console.log('Conectado ao MySQL');
-});
+// Middleware para habilitar CORS
+app.use(cors());
 
 // Middleware para parsing de JSON
 app.use(express.json());
 
+// Middleware para log de requisições
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // Rota para buscar todas as amostras (samples)
 app.get('/samples', (req, res) => {
     const query = 'SELECT * FROM inspection_items';
-    connection.query(query, (err, results) => {
+    pool.query(query, (err, results) => {
         if (err) {
             console.error('Erro ao buscar os dados:', err);
-            res.status(500).send('Erro ao buscar os dados.');
-        } else {
-            res.json(results);
+            return res.status(500).send('Erro ao buscar os dados.');
         }
+        res.json(results);
     });
 });
 
@@ -47,7 +51,7 @@ app.post('/samples', (req, res) => {
     const query = `INSERT INTO inspection_items (inputData, inspectionLot, plantNumber, location, material, description, quantity, samplePlan, status, iqcCollaborator, finishTime) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    connection.query(query, [
+    pool.query(query, [
         newSample.inputData, 
         newSample.inspectionLot, 
         newSample.plantNumber, 
@@ -62,10 +66,9 @@ app.post('/samples', (req, res) => {
     ], (err, result) => {
         if (err) {
             console.error('Erro ao adicionar amostra:', err);
-            res.status(500).send('Erro ao adicionar amostra.');
-        } else {
-            res.status(201).send('Amostra adicionada com sucesso!');
+            return res.status(500).send('Erro ao adicionar amostra.');
         }
+        res.status(201).send('Amostra adicionada com sucesso!');
     });
 });
 
@@ -74,15 +77,15 @@ app.delete('/samples/:id', (req, res) => {
     const sampleId = req.params.id;
     const query = 'DELETE FROM inspection_items WHERE id = ?';
 
-    connection.query(query, [sampleId], (err, result) => {
+    pool.query(query, [sampleId], (err, result) => {
         if (err) {
             console.error('Erro ao deletar amostra:', err);
-            res.status(500).send('Erro ao deletar a amostra.');
-        } else if (result.affectedRows === 0) {
-            res.status(404).send('Amostra não encontrada.');
-        } else {
-            res.send('Amostra deletada com sucesso!');
+            return res.status(500).send('Erro ao deletar a amostra.');
         }
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Amostra não encontrada.');
+        }
+        res.send('Amostra deletada com sucesso!');
     });
 });
 
@@ -109,7 +112,7 @@ app.put('/samples/:id', (req, res) => {
         finishTime = ? 
         WHERE id = ?`;
 
-    connection.query(query, [
+    pool.query(query, [
         updatedSample.inputData, 
         updatedSample.inspectionLot, 
         updatedSample.plantNumber, 
@@ -125,12 +128,24 @@ app.put('/samples/:id', (req, res) => {
     ], (err, result) => {
         if (err) {
             console.error('Erro ao atualizar amostra:', err);
-            res.status(500).send('Erro ao atualizar amostra.');
-        } else if (result.affectedRows === 0) {
-            res.status(404).send('Amostra não encontrada.');
-        } else {
-            res.send('Amostra atualizada com sucesso!');
+            return res.status(500).send('Erro ao atualizar amostra.');
         }
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Amostra não encontrada.');
+        }
+        res.send('Amostra atualizada com sucesso!');
+    });
+});
+
+// Finalizar pool ao encerrar a aplicação
+process.on('SIGINT', () => {
+    pool.end((err) => {
+        if (err) {
+            console.error('Erro ao encerrar pool de conexões:', err);
+        } else {
+            console.log('Conexão ao MySQL encerrada.');
+        }
+        process.exit();
     });
 });
 
