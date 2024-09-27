@@ -17,6 +17,11 @@ const pool = mysql.createPool({
 });
 
 // Middleware para habilitar CORS
+const corsOptions = {
+    origin: 'https://juniorfreitas16.github.io',
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(cors());
 
 // Middleware para parsing de JSON
