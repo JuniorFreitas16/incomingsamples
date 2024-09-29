@@ -5,99 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Itens - Output de Itens em QMLOT</title>
     <style>
-        /* O mesmo CSS fornecido */
         body {
-                font-family: Arial, sans-serif;
-                background-color: #f0f4f8;
-                color: #333;
-            }
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
 
-            .container {
-                width: 98%;
-                margin: auto;
-                padding: 20px;
-                background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                overflow: auto;
+        .container {
+            width: 98%;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
 
-            }
-
-            .navigation {
-                padding: 20px;
-                background-color: #0033a0; /* Royal Blue */
-                color: white;
-                text-align: left;
-            }
-
-            .navigation a {
-                color: white;
-                text-decoration: none;
-                font-weight: bold;
-                margin: 0 10px;
-            }
-
-            .navigation a:hover {
-                text-decoration: underline;
-            }
-
-            h1 {
-                text-align: center;
-                color: #0033a0; /* Royal Blue */
-            }
-
-            .dashboard {
-                width: 80%;
-                margin: auto;
-                padding: 20px;
-                background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            #filters {
-                margin-top: 20px;
-                width: 100%;
-            }
-
-            #filters input{
-                width: 120px;
-                margin-left: 10px;
-            }
-
-            #filters div {
-                width: 100%;
-                align-items: center;
-            }
-
-            .dashboard-info {
-                display: flex;
-                justify-content: space-around;
-                flex-wrap: wrap;
-            }
-
-            .dashboard-info div {
-                flex: 1;
-                margin: 10px;
-                text-align: center;
-            }
-
-            .export-button {
-                text-align: right;
-                margin: 20px 0;
-            }
-
-            .export-button button {
-            background-color: #002366;
+        .navigation {
+            padding: 20px;
+            background-color: #0033a0;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: right;
-            }
+            text-align: left;
+        }
 
-            button {
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0033a0;
+        }
+
+        #filters {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #filters input {
+            width: 120px;
+            margin-left: 10px;
+        }
+
+        #filters div {
+            width: 100%;
+            align-items: center;
+        }
+
+        .table {
+            width: 98%;
+            margin-top: 10px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #0033a0;
+            color: white;
+        }
+
+        .status-in-progress {
+            color: blue;
+        }
+
+        .status-pending {
+            color: red;
+        }
+
+        .status-finalized {
+            color: green;
+        }
+
+        button {
             background-color: #002366;
             color: white;
             padding: 5px 10px;
@@ -106,62 +109,7 @@
             cursor: pointer;
             text-align: right;
             margin: 2px;
-            }
-
-            @media                 
-            (max-width: 600px){
-                .container{
-                width: 100%;
-                padding: 10px;
-                }
-                .table{
-                    width: 700px;
-                    padding: 10px;
-                    overflow-x: auto; /* Permite rolagem horizontal */
-                }}
-            
-            .table {
-                justify-content: space-between;
-                width: 98%;
-                margin-top: 10px;
-                padding: 20px;
-                background-color: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            table, th, td {
-                border: 1px solid #ddd;
-            }
-
-            th, td {
-                padding: 10px;
-                text-align: center;
-            }
-
-            th {
-                background-color: #0033a0; /* Royal Blue */
-                color: white;
-            }
-
-            .status-in-progress {
-                color: blue;
-            }
-
-            .status-pending {
-                color: red;
-            }
-
-            .status-finalized {
-                color: green;
-            }
+        }
     </style>
 </head>
 <body>
@@ -208,51 +156,50 @@
         </div>
         
         <div class="table">
-        <table>
-            <thead>
-                <tr>
-                    <th>Data Input</th>
-                    <th>Inspection Lot</th>
-                    <th>Número Planta</th>
-                    <th>Locação</th>
-                    <th>Material</th>
-                    <th>Descrição</th>
-                    <th>Qtd Lote</th>
-                    <th>Plano Amostra</th>
-                    <th>Status</th>
-                    <th>Colaborador IQC</th>
-                    <th>Hora de Conclusão</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listTableBody">
-                <!-- Os dados da tabela serão preenchidos dinamicamente -->
-            </tbody>
-        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Input</th>
+                        <th>Inspection Lot</th>
+                        <th>Número Planta</th>
+                        <th>Locação</th>
+                        <th>Material</th>
+                        <th>Descrição</th>
+                        <th>Qtd Lote</th>
+                        <th>Plano Amostra</th>
+                        <th>Status</th>
+                        <th>Colaborador IQC</th>
+                        <th>Hora de Conclusão</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listTableBody">
+                    <!-- Os dados da tabela serão preenchidos dinamicamente -->
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="export-button">
-        <button id="exportButton">Exportar para Excel</button>
-    </div>
-
     <script>
+        // Função para buscar os dados do backend
         async function fetchSamples() {
             try {
-                const response = await fetch('/samples');
+                const response = await fetch('http://52.67.36.220:3000/samples');
                 const samples = await response.json();
                 updateTable(samples);
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
+                alert('Erro ao carregar dados do servidor.');
             }
         }
 
+        // Função para atualizar a tabela com os dados do servidor
         function updateTable(samples) {
             const listTableBody = document.getElementById('listTableBody');
             listTableBody.innerHTML = '';
             samples.forEach(sample => {
                 const row = listTableBody.insertRow();
-                row.insertCell(0).textContent = sample.inputData;
+                row.insertCell(0).textContent = new Date(sample.inputData).toLocaleString('pt-BR');
                 row.insertCell(1).textContent = sample.inspectionLot;
                 row.insertCell(2).textContent = sample.plantNumber;
                 row.insertCell(3).textContent = sample.location;
@@ -260,6 +207,8 @@
                 row.insertCell(5).textContent = sample.description;
                 row.insertCell(6).textContent = sample.quantity;
                 row.insertCell(7).textContent = sample.samplePlan;
+
+                // Status com cor de destaque
                 const statusCell = row.insertCell(8);
                 statusCell.textContent = sample.status;
                 statusCell.classList.add(
@@ -268,8 +217,9 @@
                     'status-finalized'
                 );
                 row.insertCell(9).textContent = sample.iqcCollaborator;
-                row.insertCell(10).textContent = sample.finishTime;
+                row.insertCell(10).textContent = sample.finishTime ? new Date(sample.finishTime).toLocaleString('pt-BR') : '---';
 
+                // Ações (Alterar/Excluir)
                 const actionsCell = row.insertCell(11);
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Alterar';
@@ -283,38 +233,31 @@
             });
         }
 
+        // Função para redirecionar à página de edição
         function editSample(id) {
             window.location.href = `edit.html?id=${id}`;
         }
 
+        // Função para excluir uma amostra
         async function deleteSample(id) {
-            try {
-                await fetch(`http://52.67.36.220/samples/${id}`, { method: 'DELETE' });
-                alert('Item excluído com sucesso!');
-                fetchSamples(); // Atualiza a tabela após excluir
-            } catch (error) {
-                console.error('Erro ao excluir item:', error);
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                try {
+                    await fetch(`http://52.67.36.220:3000/samples/${id}`, { method: 'DELETE' });
+                    alert('Item excluído com sucesso!');
+                    fetchSamples(); // Atualiza a tabela após excluir
+                } catch (error) {
+                    console.error('Erro ao excluir item:', error);
+                    alert('Erro ao excluir item.');
+                }
             }
         }
 
+        // Carregar os dados ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
             fetchSamples();
-
-            document.getElementById('exportButton').addEventListener('click', exportToExcel);
         });
 
-        function exportToExcel() {
-            const table = document.querySelector('table');
-            const tableHTML = table.outerHTML.replace(/ /g, '%20');
-            const filename = 'samples_data.xls';
-            const downloadLink = document.createElement('a');
-            downloadLink.href = 'data:application/vnd.ms-excel,' + tableHTML;
-            downloadLink.download = filename;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
-
+        // Aplicar filtros na tabela
         function applyFilters() {
             const filterDate = document.getElementById('filterDate').value.toLowerCase();
             const filterInspectionLot = document.getElementById('filterInspectionLot').value.toLowerCase();
@@ -346,12 +289,11 @@
                 const matchStatus = !filterStatus || statusCell.includes(filterStatus);
                 const matchCollaborator = !filterCollaborator || collaboratorCell.includes(filterCollaborator);
 
-                // Se todos os filtros forem correspondentes, mostrar a linha, caso contrário, escondê-la.
                 row.style.display = (matchDate && matchInspectionLot && matchPlant && matchLocation && matchMaterial && matchDescription && matchStatus && matchCollaborator) ? '' : 'none';
             });
         }
 
-        // Função para limpar os filtros e restaurar a tabela
+        // Função para limpar os filtros
         function clearFilters() {
             document.getElementById('filterDate').value = '';
             document.getElementById('filterInspectionLot').value = '';
@@ -361,14 +303,10 @@
             document.getElementById('filterDescription').value = '';
             document.getElementById('filterStatus').value = '';
             document.getElementById('filterCollaborator').value = '';
-            
-            // Mostrar todas as linhas
+
             const rows = document.querySelectorAll('#listTableBody tr');
-            rows.forEach(row => {
-                row.style.display = '';
-            });
+            rows.forEach(row => row.style.display = '');
         }
     </script>
-    //<script src="app.js"></script>
 </body>
 </html>
