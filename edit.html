@@ -121,43 +121,49 @@
     </div>
 
     <script>
+        // Função para obter parâmetros da URL (como o ID do item)
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
 
+        // Carregar os dados do item ao abrir a página
         document.addEventListener('DOMContentLoaded', () => {
             const id = getQueryParam('id');
 
             if (!id) {
-                alert('ID não fornecido.');
+                alert('ID do item não fornecido.');
                 return;
             }
 
-            // Carregar o item usando AJAX
-            fetch(`http://52.67.36.220/load_item?id=${id}`)
-                .then(response => response.json())
-                .then(sample => {
-                    if (sample) {
-                        document.getElementById('inputData').value = sample.inputData;
-                        document.getElementById('inspectionLot').value = sample.inspectionLot;
-                        document.getElementById('plantNumber').value = sample.plantNumber;
-                        document.getElementById('location').value = sample.location;
-                        document.getElementById('material').value = sample.material;
-                        document.getElementById('description').value = sample.description;
-                        document.getElementById('quantity').value = sample.quantity;
-                        document.getElementById('samplePlan').value = sample.samplePlan;
-                        document.getElementById('status').value = sample.status;
-                        document.getElementById('iqcCollaborator').value = sample.iqcCollaborator;
-                        document.getElementById('finishTime').value = sample.finishTime;
-                    } else {
-                        alert('Item não encontrado.');
+            // Buscar dados do item via API
+            fetch(`http://52.67.36.220:3000/samples/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar item');
                     }
+                    return response.json();
+                })
+                .then(sample => {
+                    // Preencher o formulário com os dados do item
+                    document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
+                    document.getElementById('inspectionLot').value = sample.inspectionLot;
+                    document.getElementById('plantNumber').value = sample.plantNumber;
+                    document.getElementById('location').value = sample.location;
+                    document.getElementById('material').value = sample.material;
+                    document.getElementById('description').value = sample.description;
+                    document.getElementById('quantity').value = sample.quantity;
+                    document.getElementById('samplePlan').value = sample.samplePlan;
+                    document.getElementById('status').value = sample.status;
+                    document.getElementById('iqcCollaborator').value = sample.iqcCollaborator;
+                    document.getElementById('finishTime').value = sample.finishTime ? new Date(sample.finishTime).toISOString().slice(0, 16) : '';
                 })
                 .catch(error => {
                     console.error('Erro ao carregar item:', error);
+                    alert('Erro ao carregar item.');
                 });
 
+            // Submeter o formulário para atualizar o item
             document.getElementById('editForm').addEventListener('submit', function(event) {
                 event.preventDefault();
 
@@ -172,28 +178,30 @@
                     samplePlan: document.getElementById('samplePlan').value,
                     status: document.getElementById('status').value,
                     iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                    finishTime: document.getElementById("status").value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
+                    finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
                 };
 
-                // Enviar os dados para o Node.js
-                fetch(`http://52.67.36.220/sample/${id}`, {
-                    method: 'POST',
+                // Enviar os dados para a API usando PUT
+                fetch(`http://52.67.36.220:3000/samples/${id}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(formData),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Item atualizado com sucesso!');
-                        window.location.href = 'list.html';
-                    } else {
-                        alert('Erro ao atualizar item: ' + data.message);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao atualizar item');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Item atualizado com sucesso!');
+                    window.location.href = 'list.html';
                 })
                 .catch(error => {
                     console.error('Erro ao atualizar item:', error);
+                    alert('Erro ao atualizar item.');
                 });
             });
         });
