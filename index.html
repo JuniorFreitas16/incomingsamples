@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Output de Itens em QMLOT</title>
+    <title>Cadastro de Itens - Incoming Inspection VD</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
 
         h1 {
             text-align: center;
-            color: #0033a0;
+            color: #0033a0; /* Royal Blue */
         }
 
         label {
@@ -67,10 +67,15 @@
         .navigation a:hover {
             text-decoration: underline;
         }
+
+        #feedback {
+            color: red;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>Incoming Inspection VD - Cadastro de Itens</h1>
+    <h1>Cadastro de Amostras - Incoming Inspection VD</h1>
     <div class="container">
         <div class="navigation">
             <a href="dashboard.html">Dashboard</a>
@@ -78,16 +83,16 @@
         </div>
         
         <form id="itemForm">
-            <label for="inputData">Data Input:</label>
+            <label for="inputData">Data de Entrada:</label>
             <input type="datetime-local" id="inputData" required>
 
-            <label for="inspectionLot">Inspection Lot:</label>
+            <label for="inspectionLot">Lote de Inspeção:</label>
             <input type="number" id="inspectionLot" required>
 
-            <label for="plantNumber">Número Planta:</label>
+            <label for="plantNumber">Número da Planta:</label>
             <input type="text" id="plantNumber" required>
 
-            <label for="location">Locação:</label>
+            <label for="location">Localização:</label>
             <input type="text" id="location" required>
 
             <label for="material">Material:</label>
@@ -96,10 +101,10 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="quantity">Quantidade Lote:</label>
+            <label for="quantity">Quantidade do Lote:</label>
             <input type="number" id="quantity" required>
 
-            <label for="samplePlan">Plano de Amostra:</label>
+            <label for="samplePlan">Plano de Amostragem:</label>
             <input type="text" id="samplePlan" readonly>
 
             <label for="status">Status Atual:</label>
@@ -114,15 +119,16 @@
 
             <button type="submit">Cadastrar</button>
         </form>
-        <div id="feedback" style="color: red;"></div>
+        <div id="feedback"></div>
     </div>
 
     <script>
-        // Configuração da data de Manaus
+        // Configuração da data de Manaus no campo de data
         const now = new Date();
-        now.setHours(now.getUTCHours() - 4);  // Ajustar para o fuso horário de Manaus
+        now.setHours(now.getUTCHours() - 4);  // Ajuste para o fuso horário de Manaus
         document.getElementById('inputData').value = now.toISOString().slice(0, 16);
 
+        // Calcular plano de amostragem com base na quantidade
         document.getElementById('quantity').addEventListener('input', function() {
             const quantity = parseInt(this.value);
             let samplePlan;
@@ -142,8 +148,11 @@
             document.getElementById('samplePlan').value = samplePlan;
         });
 
+        // Submissão do formulário
         document.getElementById('itemForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            
+            // Preparar dados do formulário
             const formData = {
                 inputData: document.getElementById('inputData').value,
                 inspectionLot: document.getElementById('inspectionLot').value,
@@ -154,30 +163,33 @@
                 quantity: document.getElementById('quantity').value,
                 samplePlan: document.getElementById('samplePlan').value,
                 status: document.getElementById('status').value,
-                iqcCollaboratoriqcCollaborator: document.getElementById('iqcCollaborator').value
+                iqcCollaborator: document.getElementById('iqcCollaborator').value
             };
 
-            // Adicionar o campo finishTime apenas se o status for "Finalizado"
-            if (document.getElementById('status').value === 'Finalizado') {
+            // Adicionar o campo finishTime se o status for "Finalizado"
+            if (formData.status === 'Finalizado') {
                 formData.finishTime = new Date().toISOString().slice(0, 16);
             }
 
-            // Enviar os dados para a API
-            fetch('http://52.67.36.220/samples', {
+            // Enviar os dados para a API (integração com Sequelize no backend)
+            fetch('http://52.67.36.220:3000/samples', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
             .then(response => {
-                if (!response.ok) throw new Error('Erro ao salvar no MySQL');
+                if (!response.ok) throw new Error('Erro ao salvar os dados no banco de dados.');
                 return response.text();
             })
             .then(data => {
+                // Sucesso no cadastro
                 alert('Item cadastrado com sucesso!');
-                document.getElementById('feedback').textContent = ''; // Limpar mensagens de errodocument.getElementById('itemForm').reset(); // Resetar o formulário após o sucesso
+                document.getElementById('feedback').textContent = ''; // Limpar mensagens de erro
+                document.getElementById('itemForm').reset(); // Resetar o formulário após o sucesso
             })
             .catch(error => {
-                document.getElementById('feedback').textContent = error.message; // Mostrar o erro ao usuário
+                // Erro no cadastro
+                document.getElementById('feedback').textContent = error.message;
                 console.error('Erro:', error);
             });
         });
