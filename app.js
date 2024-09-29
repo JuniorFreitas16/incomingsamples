@@ -1,28 +1,66 @@
 require('dotenv').config(); // Carregar variáveis de ambiente
-const mysql = require('mysql2');
 const express = require('express');
 const cors = require('cors'); // Adicionando CORS
+const { Sequelize, DataTypes } = require('sequelize'); // Importando Sequelize
 const app = express();
-const port = process.env.PORT || 3000; // Porta definida via variável de ambiente
+const port = process.env.PORT || 3000;
 
-// Configuração do pool de conexões MySQL
-const pool = mysql.createPool({
+// Configuração do Sequelize com MySQL
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10, // Limite de conexões no pool
-    queueLimit: 0
+    dialect: 'mysql',
+});
+
+// Definir modelo para a tabela inspection_items (Samples)
+const Sample = sequelize.define('Sample', {
+    inputData: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    inspectionLot: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    plantNumber: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    location: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    material: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+    quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    samplePlan: {
+        type: DataTypes.STRING(100)
+    },
+    status: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    iqcCollaborator: {
+        type: DataTypes.STRING(100)
+    },
+    finishTime: {
+        type: DataTypes.DATE
+    }
+}, {
+    tableName: 'inspection_items', // Nome da tabela no banco de dados
+    timestamps: false // Se sua tabela não tem createdAt/updatedAt
 });
 
 // Middleware para habilitar CORS
-//const corsOptions = {
-//    origin: 'https://juniorfreitas16.github.io',
-//    optionsSuccessStatus: 200
-//};
-//app.use(cors(corsOptions));
-app.use (cors());
+app.use(cors());
 
 // Middleware para parsing de JSON
 app.use(express.json());
@@ -33,125 +71,81 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rota para buscar todas as amostras (samples)
-app.get('/samples', (req, res) => {
-    const query = 'SELECT * FROM inspection_items';
-    pool.query(query, (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar os dados:', err);
-            return res.status(500).send('Erro ao buscar os dados.');
-        }
-        res.json(results);
+// Testar a conexão ao banco de dados
+sequelize.authenticate()
+    .then(() => {
+        console.log('Conexão ao banco de dados foi estabelecida com sucesso.');
+    })
+    .catch(err => {
+        console.error('Erro ao conectar ao banco de dados:', err);
     });
+
+// Sincronizar o modelo com o banco de dados
+sequelize.sync();
+
+// Rota para buscar todas as amostras (samples)
+app.get('/samples', async (req, res) => {
+    try {
+        const samples = await Sample.findAll();
+        res.json(samples);
+    } catch (err) {
+        console.error('Erro ao buscar os dados:', err);
+        res.status(500).send('Erro ao buscar os dados.');
+    }
 });
 
 // Rota para adicionar uma nova amostra
-app.post('/samples', (req, res) => {
-    const newSample = req.body;
-
-    if (!newSample || Object.keys(newSample).length === 0) {
-        return res.status(400).send('Dados inválidos.');
-    }
-
-    const query = `INSERT INTO inspection_items (inputData, inspectionLot, plantNumber, location, material, description, quantity, samplePlan, status, iqcCollaborator, finishTime) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    pool.query(query, [
-        newSample.inputData, 
-        newSample.inspectionLot, 
-        newSample.plantNumber, 
-        newSample.location, 
-        newSample.material, 
-        newSample.description, 
-        newSample.quantity, 
-        newSample.samplePlan, 
-        newSample.status, 
-        newSample.iqcCollaborator, 
-        newSample.finishTime
-    ], (err, result) => {
-        if (err) {
-            console.error('Erro ao adicionar amostra:', err);
-            return res.status(500).send('Erro ao adicionar amostra.');
+app.post('/samples', async (req, res) => {
+    try {
+        const newSample = req.body;
+        if (!newSample || Object.keys(newSample).length === 0) {
+            return res.status(400).send('Dados inválidos.');
         }
+
+        const sample = await Sample.create(newSample);
         res.status(201).send('Amostra adicionada com sucesso!');
-    });
+    } catch (err) {
+        console.error('Erro ao adicionar amostra:', err);
+        res.status(500).send('Erro ao adicionar amostra.');
+    }
 });
 
 // Rota para deletar uma amostra por ID
-app.delete('/samples/:id', (req, res) => {
-    const sampleId = req.params.id;
-    const query = 'DELETE FROM inspection_items WHERE id = ?';
+app.delete('/samples/:id', async (req, res) => {
+    try {
+        const sampleId = req.params.id;
+        const result = await Sample.destroy({ where: { id: sampleId } });
 
-    pool.query(query, [sampleId], (err, result) => {
-        if (err) {
-            console.error('Erro ao deletar amostra:', err);
-            return res.status(500).send('Erro ao deletar a amostra.');
-        }
-        if (result.affectedRows === 0) {
+        if (result === 0) {
             return res.status(404).send('Amostra não encontrada.');
         }
         res.send('Amostra deletada com sucesso!');
-    });
+    } catch (err) {
+        console.error('Erro ao deletar amostra:', err);
+        res.status(500).send('Erro ao deletar a amostra.');
+    }
 });
 
 // Rota para atualizar uma amostra por ID
-app.put('/samples/:id', (req, res) => {
-    const sampleId = req.params.id;
-    const updatedSample = req.body;
+app.put('/samples/:id', async (req, res) => {
+    try {
+        const sampleId = req.params.id;
+        const updatedSample = req.body;
 
-    if (!updatedSample || Object.keys(updatedSample).length === 0) {
-        return res.status(400).send('Dados inválidos.');
-    }
-
-    const query = `UPDATE inspection_items SET 
-        inputData = ?, 
-        inspectionLot = ?, 
-        plantNumber = ?, 
-        location = ?, 
-        material = ?, 
-        description = ?, 
-        quantity = ?, 
-        samplePlan = ?, 
-        status = ?, 
-        iqcCollaborator = ?, 
-        finishTime = ? 
-        WHERE id = ?`;
-
-    pool.query(query, [
-        updatedSample.inputData, 
-        updatedSample.inspectionLot, 
-        updatedSample.plantNumber, 
-        updatedSample.location, 
-        updatedSample.material, 
-        updatedSample.description, 
-        updatedSample.quantity, 
-        updatedSample.samplePlan, 
-        updatedSample.status, 
-        updatedSample.iqcCollaborator, 
-        updatedSample.finishTime,
-        sampleId
-    ], (err, result) => {
-        if (err) {
-            console.error('Erro ao atualizar amostra:', err);
-            return res.status(500).send('Erro ao atualizar amostra.');
+        if (!updatedSample || Object.keys(updatedSample).length === 0) {
+            return res.status(400).send('Dados inválidos.');
         }
-        if (result.affectedRows === 0) {
+
+        const result = await Sample.update(updatedSample, { where: { id: sampleId } });
+
+        if (result[0] === 0) {
             return res.status(404).send('Amostra não encontrada.');
         }
         res.send('Amostra atualizada com sucesso!');
-    });
-});
-
-// Finalizar pool ao encerrar a aplicação
-process.on('SIGINT', () => {
-    pool.end((err) => {
-        if (err) {
-            console.error('Erro ao encerrar pool de conexões:', err);
-        } else {
-            console.log('Conexão ao MySQL encerrada.');
-        }
-        process.exit();
-    });
+    } catch (err) {
+        console.error('Erro ao atualizar amostra:', err);
+        res.status(500).send('Erro ao atualizar amostra.');
+    }
 });
 
 // Iniciar o servidor
