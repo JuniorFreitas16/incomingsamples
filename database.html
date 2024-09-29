@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,10 +16,14 @@
             padding: 8px;
             text-align: left;
         }
+        th {
+            background-color: #0033a0;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h1>Inspection Items</h1>
+    <h1>Lista de Itens de Inspeção</h1>
     <table>
         <thead>
             <tr>
@@ -41,15 +45,27 @@
     </table>
 
     <script>
-        fetch('http://52.67.36.220/samples')
-            .then(response => response.json())
+        // Função para formatar a data e hora
+        function formatDate(dateTimeString) {
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+        }
+
+        // Função para carregar os dados da API
+        fetch('http://52.67.36.220:3000/samples')  // Certifique-se de usar a rota correta
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar os dados do servidor');
+                }
+                return response.json();
+            })
             .then(data => {
                 const tableBody = document.getElementById('tableBody');
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.id}</td>
-                        <td>${item.inputData}</td>
+                        <td>${formatDate(item.inputData)}</td>
                         <td>${item.inspectionLot}</td>
                         <td>${item.plantNumber}</td>
                         <td>${item.location}</td>
@@ -63,8 +79,10 @@
                     tableBody.appendChild(row);
                 });
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar dados do servidor.');
+            });
     </script>
-    <script src="app.js"></script>
-  </body>
+</body>
 </html>
