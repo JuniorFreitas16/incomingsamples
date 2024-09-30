@@ -193,16 +193,6 @@
                 console.error('Erro:', error);
             });
         });
-
-// if using synchronous loading, will be called once the DOM is ready
-turnstile.ready(function () {
-  turnstile.render("#example-container", {
-    sitekey: "<0XAAAAAAAv2dxJAq6RtLCx4",
-    callback: function (token) {
-      console.log(`Challenge Success ${token}`);
-    },
-  });
-});
     </script>
     <script src=> 
 </body>
