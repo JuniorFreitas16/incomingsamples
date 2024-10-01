@@ -121,6 +121,12 @@
     </div>
 
     <script>
+        // Configuração da data de Manaus no campo de data
+        const now = new Date();
+        now.setHours(now.getUTCHours() - 8);  // Ajuste para o fuso horário de Manaus
+        document.getElementById('inputData').value = now.toISOString().slice(0, 16);
+        
+        
         // Função para obter o parâmetro 'id' da URL
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -146,7 +152,8 @@
                 })
                 .then(sample => {
                     // Preencher o formulário com os dados do item
-                    document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
+                    //document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
+                    document.getElementById('inputData').value = sample.inputData;
                     document.getElementById('inspectionLot').value = sample.inspectionLot;
                     document.getElementById('plantNumber').value = sample.plantNumber;
                     document.getElementById('location').value = sample.location;
