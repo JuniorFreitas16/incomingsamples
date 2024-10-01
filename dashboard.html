@@ -279,7 +279,7 @@
             document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
         }
 
-     /*   // Função para renderizar os gráficos
+        // Função para renderizar os gráficos
         function renderCharts(samples) {
             // Gráfico de status das inspeções
             const statusCounts = samples.reduce((counts, sample) => {
@@ -287,7 +287,7 @@
                 return counts;
             }, {});
 
-            const chart = JSC.chart('chartDiv', {
+         /*   const chart = JSC.chart('chartDiv', {
                 title_label_text: 'Inspeções por Status',
                 series: [
                     {
@@ -297,7 +297,7 @@
                         }))
                     }
                 ]
-            });
+            });*/
 
             // Gráfico de amostras por status
             const planCounts = samples.reduce((counts, sample) => {
@@ -309,7 +309,7 @@
                 return counts;
             }, { completed: 0, inProgress: 0 });
 
-            const chart2 = JSC.chart('chartDiv2', {
+           /* const chart2 = JSC.chart('chartDiv2', {
                 title_label_text: 'Amostras por Status',
                 series: [
                     {
@@ -374,7 +374,7 @@
             {
             points: [
             {x: 'Em inspeção', y: (samplePlanInProgress/(samplePlanCompleted+samplePlanInProgress))*100 },
-            {x: 'Liberadas', y: (samplePlanCompleted/(samplePlanCompleted+samplePlanInProgress))*100  }
+            {x: 'Liberadas', y: (planCounts.completed/(planCounts.Completed+planCounts.inProgress))*100  }
             ]
             }
             ]
