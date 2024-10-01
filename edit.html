@@ -121,7 +121,7 @@
     </div>
 
     <script>
-        // Função para obter parâmetros da URL (como o ID do item)
+        // Função para obter o parâmetro 'id' da URL
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
@@ -132,15 +132,15 @@
             const id = getQueryParam('id');
 
             if (!id) {
-                alert('ID do item não fornecido.');
+                alert('ID do item não fornecido na URL.');
                 return;
             }
 
-            // Buscar dados do item via API
+            // Buscar os dados do item via API
             fetch(`https://52.67.36.220/samples/${id}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Erro ao carregar item');
+                        throw new Error('Erro ao carregar item.');
                     }
                     return response.json();
                 })
@@ -181,7 +181,7 @@
                     finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
                 };
 
-                // Enviar os dados para a API usando PUT
+                // Enviar os dados atualizados para a API usando o método PUT
                 fetch(`https://52.67.36.220/samples/${id}`, {
                     method: 'PUT',
                     headers: {
@@ -191,13 +191,13 @@
                 })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Erro ao atualizar item');
+                        throw new Error('Erro ao atualizar item.');
                     }
                     return response.json();
                 })
                 .then(data => {
                     alert('Item atualizado com sucesso!');
-                    window.location.href = 'list.html';
+                    window.location.href = 'list.html';  // Redireciona para a lista de itens após a atualização
                 })
                 .catch(error => {
                     console.error('Erro ao atualizar item:', error);
