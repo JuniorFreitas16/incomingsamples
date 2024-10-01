@@ -319,8 +319,8 @@ document.getElementById('pendingItems').textContent = pendingItems;
             series: [
                 {
                     points: [
-                        { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress)*100)},                        
-{ x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress)*100)}
+                        { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress))*100},                        
+{ x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
 
                     ]
                 }
