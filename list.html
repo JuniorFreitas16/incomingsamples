@@ -242,7 +242,7 @@
         async function deleteSample(id) {
             if (confirm('Tem certeza que deseja excluir este item?')) {
                 try {
-                    await fetch(`http://52.67.36.220:3000/samples/${id}`, { method: 'DELETE' });
+                    await fetch(`https://52.67.36.220/samples/${id}`, { method: 'DELETE' });
                     alert('Item excluído com sucesso!');
                     fetchSamples(); // Atualiza a tabela após excluir
                 } catch (error) {
