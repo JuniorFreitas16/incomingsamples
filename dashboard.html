@@ -287,7 +287,7 @@ document.getElementById('pendingItems').textContent = pendingItems;
         }, {});
 
         const chart = JSC.chart('chartDiv', {
-            title_label_text: 'Inspeções por Status',
+            title_label_text: 'Inspeções',
             box: {
             padding: 10,
             radius: 5,
@@ -330,7 +330,9 @@ document.getElementById('pendingItems').textContent = pendingItems;
         }, { completed: 0, inProgress: 0 });
 
         const chart2 = JSC.chart('chartDiv2', {
-            title_label_text: 'Amostras por Status',
+            title_label_text: 'Amostras',
+            fill: '#e5f6ff'},
+            position: 'center', 
             type: 'column', 
             legend_visible: false, 
             defaultPoint:{
