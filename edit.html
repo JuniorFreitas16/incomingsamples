@@ -146,7 +146,8 @@
                 })
                 .then(sample => {
                     // Preencher o formulário com os dados do item
-                    document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
+                    //document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
+                    document.getElementById('inputData').value = sample.inputData;
                     document.getElementById('inspectionLot').value = sample.inspectionLot;
                     document.getElementById('plantNumber').value = sample.plantNumber;
                     document.getElementById('location').value = sample.location;
