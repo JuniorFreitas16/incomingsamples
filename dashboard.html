@@ -310,7 +310,8 @@ document.getElementById('pendingItems').textContent = pendingItems;
 
         const chart2 = JSC.chart('chartDiv2', {
             title_label_text: 'Amostras por Status',
-            type: 'pie donut', 
+            type: 'column', 
+            legend_visible: false, 
             series: [
                 {
                     points: [
