@@ -312,6 +312,10 @@ document.getElementById('pendingItems').textContent = pendingItems;
             title_label_text: 'Amostras por Status',
             type: 'column', 
             legend_visible: false, 
+            label: {
+            text: '{%yValue:n1}%',
+            margin: 10
+            }}, 
             series: [
                 {
                     points: [
