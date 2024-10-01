@@ -347,13 +347,13 @@ document.getElementById('pendingItems').textContent = pendingItems;
                 {
                     points: [
                         { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress))*100},                        
-{ x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
+                        { x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
 
                     ]
                 }
             ]
-        })} ;
-    }
+        });
+    
 
     // Carregar os dados assim que a página carregar
     document.addEventListener('DOMContentLoaded', () => {
