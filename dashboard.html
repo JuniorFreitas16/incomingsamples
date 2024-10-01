@@ -155,42 +155,6 @@
             <a href="list.html">Lista de Itens</a>
         </div>
 
-        <!-- Filtros de busca -->
-        <div id="filters">
-            <div>
-                <label for="filterDate">Data de Input:</label>
-                <input type="date" id="filterDate">
-
-                <label for="filterInspectionLot">Inspection Lot:</label>
-                <input type="number" id="filterInspectionLot">
-
-                <label for="filterPlant">Número Planta:</label>
-                <input type="text" id="filterPlant">
-
-                <label for="filterLocation">Locação:</label>
-                <input type="text" id="filterLocation">
-            </div>
-
-            <div>
-                <label for="filterMaterial">Material:</label>
-                <input type="text" id="filterMaterial">
-
-                <label for="filterStatus">Status:</label>
-                <select id="filterStatus">
-                    <option value="">Todos</option>
-                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
-                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
-                    <option value="Finalizado">Finalizado</option>
-                </select>
-
-                <label for="filterCollaborator">Colaborador IQC:</label>
-                <input type="text" id="filterCollaborator">
-
-                <button onclick="applyFilters()">Aplicar Filtros</button>
-                <button onclick="clearFilters()">Limpar Filtros</button>
-            </div>
-        </div>
-
         <div class="stats">
             <div class="stat-box">
                 <h2 id="totalSamples">0</h2>
@@ -244,6 +208,41 @@
                     <!-- Os dados da tabela serão preenchidos dinamicamente -->
                 </tbody>
             </table>
+        </div>
+        <!-- Filtros de busca -->
+        <div id="filters">
+            <div>
+                <label for="filterDate">Data de Input:</label>
+                <input type="date" id="filterDate">
+
+                <label for="filterInspectionLot">Inspection Lot:</label>
+                <input type="number" id="filterInspectionLot">
+
+                <label for="filterPlant">Número Planta:</label>
+                <input type="text" id="filterPlant">
+
+                <label for="filterLocation">Locação:</label>
+                <input type="text" id="filterLocation">
+            </div>
+
+            <div>
+                <label for="filterMaterial">Material:</label>
+                <input type="text" id="filterMaterial">
+
+                <label for="filterStatus">Status:</label>
+                <select id="filterStatus">
+                    <option value="">Todos</option>
+                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+
+                <label for="filterCollaborator">Colaborador IQC:</label>
+                <input type="text" id="filterCollaborator">
+
+                <button onclick="applyFilters()">Aplicar Filtros</button>
+                <button onclick="clearFilters()">Limpar Filtros</button>
+            </div>
         </div>
     </div>
 
@@ -368,42 +367,88 @@
             updateDashboard(allSamples); // Atualizar os contadores com todas as amostras
         }
 
-        // Função para renderizar os gráficos
-        function renderCharts(samples) {
-            const statusCounts = samples.reduce((counts, sample) => {
-                counts[sample.status] = (counts[sample.status] || 0) + 1;
-                return counts;
-            }, {});
+// Função para renderizar os gráficos
+function renderCharts(samples) {
+        // Gráfico de status das inspeções
+        const statusCounts = samples.reduce((counts, sample) => {
+            counts[sample.status] = (counts[sample.status] || 0) + 1;
+            return counts;
+        }, {});
 
-            JSC.chart('chartDiv', {
-                title_label_text: 'Inspeções por Status',
-                series: [{
+        const chart = JSC.chart('chartDiv', {
+            title_label_text: 'Inspeções',
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            palette: ['#4169E1', '#0040FF', '#86878A'],
+            title: {
+            label_text: 'Inspeções',
+            position: 'center',
+            },
+            legend_visible: true, 
+            legend_position: 'bottom', 
+            defaultSeries: {
+            type: 'pie',
+            angle_orientation: 125,
+            shape_padding: 2,
+            mouseTracking_enabled: true
+            },
+            defaultPoint: {
+            label: {
+            text: '%yValue',
+            margin: 10
+            }},
+            series: [
+                {
                     points: Object.keys(statusCounts).map(status => ({
                         x: status,
                         y: statusCounts[status]
                     }))
-                }]
-            });
-
-            const planCounts = samples.reduce((counts, sample) => {
-                if (sample.status === 'Finalizado') {
-                    counts.completed += parseInt(sample.samplePlan) || 0;
-                } else if (sample.status === 'Em Processo de Inspeção') {
-                    counts.inProgress += parseInt(sample.samplePlan) || 0;
                 }
-                return counts;
-            }, { completed: 0, inProgress: 0 });
+            ]
+        });
 
-            JSC.chart('chartDiv2', {
-                title_label_text: 'Amostras por Status',
-                series: [{
+        // Gráfico de amostras por status
+        const planCounts = samples.reduce((counts, sample) => {
+            if (sample.status === 'Finalizado') {
+                counts.completed += parseInt(sample.samplePlan) || 0;
+            } else if (sample.status === 'Em Processo de Inspeção') {
+                counts.inProgress += parseInt(sample.samplePlan) || 0;
+            }
+            return counts;
+        }, { completed: 0, inProgress: 0 });
+
+        const chart2 = JSC.chart('chartDiv2', {
+            title_label_text: 'Amostras',
+            box: {
+            radius: 5,
+            fill: '#e5f6ff'},
+            title: {
+            label_text: 'Amostras',
+            position: 'center',
+            }, 
+            type: 'column', 
+            label_text: 'Amostras',
+            position: 'center', 
+            legend_visible: false, 
+            defaultPoint:{
+            label: {
+            text: '{%yValue:n1}%',
+            margin: 10
+            }}, 
+            series: [
+                {
                     points: [
-                        { x: 'Amostras Finalizadas', y: planCounts.completed },
-                        { x: 'Amostras em Inspeção', y: planCounts.inProgress }
+                        { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress))*100},                        
+                        { x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
+
                     ]
-                }]
-            });
-        }
+                }
+            ]
+        });
+   } 
+
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSamples(); // Carregar as amostras ao abrir a página
