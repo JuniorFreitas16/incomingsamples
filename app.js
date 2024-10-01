@@ -149,6 +149,39 @@ app.put('/samples/:id', async (req, res) => {
     }
 });
 
+// Buscar um item por ID
+app.get('/samples/:id', (req, res) => {
+    const id = req.params.id;
+    Sample.findByPk(id)
+        .then(sample => {
+            if (!sample) {
+                return res.status(404).send('Item não encontrado');
+            }
+            res.json(sample);
+        })
+        .catch(err => {
+            res.status(500).send('Erro ao buscar o item.');
+        });
+});
+
+// Atualizar um item por ID
+app.put('/samples/:id', (req, res) => {
+    const id = req.params.id;
+    const updatedData = req.body;
+
+    Sample.update(updatedData, { where: { id: id } })
+        .then(numRowsUpdated => {
+            if (numRowsUpdated[0] === 0) {
+                return res.status(404).send('Item não encontrado.');
+            }
+            res.send('Item atualizado com sucesso!');
+        })
+        .catch(err => {
+            res.status(500).send('Erro ao atualizar o item.');
+        });
+});
+
+
 // Iniciar o servidor
 app.listen(port, () => {
     console.log(`Servidor rodando em http://52.67.36.220:${port}`);
