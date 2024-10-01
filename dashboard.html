@@ -288,6 +288,27 @@ document.getElementById('pendingItems').textContent = pendingItems;
 
         const chart = JSC.chart('chartDiv', {
             title_label_text: 'Inspeções por Status',
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            palette: ['#4169E1', '#FF0000', '#00FA9A'],
+            title: {
+            label_text: 'Inspeções',
+            position: 'center',
+            },
+            legend_visible: false,
+            defaultSeries: {
+            type: 'pie donut',
+            angle_orientation: 125,
+            shape_padding: 2,
+            mouseTracking_enabled: true
+            },
+            defaultPoint: {
+            label: {
+            text: '%name : %yValue',
+            margin: 10
+            }},
             series: [
                 {
                     points: Object.keys(statusCounts).map(status => ({
