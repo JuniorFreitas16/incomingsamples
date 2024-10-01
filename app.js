@@ -80,16 +80,6 @@ sequelize.authenticate()
         console.error('Erro ao conectar ao banco de dados:', err);
     });
 
-// if using synchronous loading, will be called once the DOM is ready
-turnstile.ready(function () {
-  turnstile.render("#example-container", {
-    sitekey: "<0x4AAAAAAAv2d62QqYjjeUNcmy9jsv9S2Nw>",
-    callback: function (token) {
-      console.log(`Challenge Success ${token}`);
-    },
-  });
-});
-
 
 // Sincronizar o modelo com o banco de dados
 sequelize.sync();
