@@ -208,7 +208,7 @@
 
         // Função para buscar os dados da API
         function loadSamples() {
-            return fetch('https://52.67.36.220/samples')  // Rota correta para buscar os dados
+            return fetch('http://52.67.36.220:3000/samples')  // Rota correta para buscar os dados
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Erro ao buscar os dados do servidor');
@@ -251,8 +251,7 @@
                 }
 
                 const row = dashboardTableBody.insertRow();
-                //row.insertCell(0).textContent = formatDate(sample.inputData);
-                row.insertCell(0).textContent = sample.inputData;
+                row.insertCell(0).textContent = formatDate(sample.inputData);
                 row.insertCell(1).textContent = sample.inspectionLot;
                 row.insertCell(2).textContent = sample.plantNumber;
                 row.insertCell(3).textContent = sample.location;
@@ -273,122 +272,98 @@
             // Atualizar os valores no dashboard
             document.getElementById('totalSamples').textContent = totalSamples;
             document.getElementById('inProgressSamples').textContent = inProgressSamples;
-            document.getElementById('pendingItems').textContent = pendingItems;
-            document.getElementById('completedSamples').textContent = completedSamples;
-            document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
-            document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
-        }
+document.getElementById('pendingItems').textContent = pendingItems;
+        document.getElementById('completedSamples').textContent = completedSamples;
+        document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
+        document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
+    }
 
-        // Função para renderizar os gráficos
-        function renderCharts(samples) {
-            // Gráfico de status das inspeções
-            const statusCounts = samples.reduce((counts, sample) => {
-                counts[sample.status] = (counts[sample.status] || 0) + 1;
-                return counts;
-            }, {});
+    // Função para renderizar os gráficos
+    function renderCharts(samples) {
+        // Gráfico de status das inspeções
+        const statusCounts = samples.reduce((counts, sample) => {
+            counts[sample.status] = (counts[sample.status] || 0) + 1;
+            return counts;
+        }, {});
 
-            const chart = JSC.chart('chartDiv', {   
+        const chart = JSC.chart('chartDiv', {
             title_label_text: 'Inspeções por Status',
-                series: [
-                    {
-                        points: Object.keys(statusCounts).map(status => ({
-                            x: status,
-                            y: statusCounts[status]
-                        }))
-                    }
-                ]
-            });
-
-            // Gráfico de amostras por status
-            const planCounts = samples.reduce((counts, sample) => {
-                if (sample.status === 'Finalizado') {
-                    counts.completed += parseInt(sample.samplePlan) || 0;
-                } else if (sample.status === 'Em Processo de Inspeção') {
-                    counts.inProgress += parseInt(sample.samplePlan) || 0;
+            series: [
+                {
+                    points: Object.keys(statusCounts).map(status => ({
+                        x: status,
+                        y: statusCounts[status]
+                    }))
                 }
-                return counts;
-            }, { completed: 0, inProgress: 0 });
-
-            const chart2 = JSC.chart('chartDiv2', {
-                title_label_text: 'Amostras por Status',
-                series: [
-                    {
-                        points: [
-                            { x: 'Amostras Finalizadas', y: planCounts.completed },
-                            { x: 'Amostras em Inspeção', y: planCounts.inProgress }
-                        ]
-                    }
-                ]
-            });
-        }  
-
-           /*     //Gráficos
-            JSC.Chart('chartDiv', {
-            box: {
-            padding: 10,
-            radius: 5,
-            fill: '#e5f6ff'},
-            palette: ['#4169E1', '#FF0000', '#00FA9A'],
-            title: {
-            label_text: 'Inspeções',
-            position: 'center',
-            },
-            legend_visible: false,
-            defaultSeries: {
-            type: 'pie donut',
-            angle_orientation: 125,
-            shape_padding: 2,
-            mouseTracking_enabled: true
-            },
-            defaultPoint: {
-            label: {
-            text: '%name : %yValue',
-            margin: 10
-            }},
-            series: [
-            {
-            points: [
-            {x: 'Em andamento', y: inProgressSamples},
-            {x: 'Pendentes', y: pendingItems},
-            {x: 'Finalizados', y: completedSamples}
             ]
-            }
-            ]
-            });
-
-            JSC.Chart('chartDiv2', {
-            box: {
-            padding: 10,
-            radius: 5,
-            fill: '#e5f6ff'},
-            type: 'column',
-            title_label_text: 'Amostras',
-            title_position: 'center', 
-            legend_visible: false, 
-            defaultPoint: {
-            label: {
-            text: '{%yValue:n1}%',
-            margin: 10
-            }},
-            series: [
-            {
-            points: [
-            {x: 'Em inspeção', y: (planCouts.InProgress/(planCouts.Completed+planCounts.InProgress))*100 },
-            {x: 'Liberadas', y: (planCounts.completed/(planCounts.Completed+planCounts.inProgress))*100  }
-            ]
-            }
-            ]
-            });
-*/
-
-
-        // Carregar os dados assim que a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSamples();
         });
-    </script>
-<script>"https://code.jscharting.com/2.9.0/jscharting.js"</script>
-<script src="app.js"></script>
-</body>
 
+        // Gráfico de amostras por status
+        const planCounts = samples.reduce((counts, sample) => {
+            if (sample.status === 'Finalizado') {
+                counts.completed += parseInt(sample.samplePlan) || 0;
+            } else if (sample.status === 'Em Processo de Inspeção') {
+                counts.inProgress += parseInt(sample.samplePlan) || 0;
+            }
+            return counts;
+        }, { completed: 0, inProgress: 0 });
+
+        const chart2 = JSC.chart('chartDiv2', {
+            title_label_text: 'Amostras por Status',
+            series: [
+                {
+                    points: [
+                        { x: 'Amostras Finalizadas', y: planCounts.completed },
+                        { x: 'Amostras em Inspeção', y: planCounts.inProgress }
+                    ]
+                }
+            ]
+        });
+    }
+
+    // Carregar os dados assim que a página carregar
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSamples();
+    });
+</script>
+
+</body>
+<script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
 </html>
+```Alterações e melhorias realizadas:
+
+1. Integração com o backend via fetch:
+
+A rota /samples é chamada corretamente para buscar os dados via API, que agora está conectada ao backend utilizando Sequelize.
+
+
+
+2. Atualização da tabela e dashboard:
+
+O dashboard é atualizado dinamicamente com os dados obtidos da API, incluindo o preenchimento da tabela com as amostras e os gráficos gerados dinamicamente.
+
+
+
+3. Renderização de gráficos:
+
+Gráficos dinâmicos são gerados com base nos status das inspeções e no número de amostras finalizadas ou em andamento.
+
+
+
+4. Formatação de datas:
+
+As datas são formatadas corretamente para o fuso horário de Manaus, garantindo que as informações estejam corretas.
+
+
+
+5. Tratamento de erros:
+
+Caso ocorra algum erro ao carregar os dados, o usuário será notificado com uma mensagem, e os erros são registrados no console.
+
+
+
+
+Conclusão:
+
+Com esse ajuste, o dashboard.html agora se integra perfeitamente com o backend que usa Sequelize, exibindo as informações das amostras em tempo real no dashboard, com gráficos e estatísticas atualizados. Se precisar de mais ajustes ou tiver dúvidas, estou à disposição!
+
