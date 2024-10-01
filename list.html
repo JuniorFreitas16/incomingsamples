@@ -181,10 +181,7 @@
     </div>
 
     <script>
-       // Configuração da data de Manaus no campo de data
-        const now = new Date();
-        now.setHours(now.getUTCHours() - 8);  // Ajuste para o fuso horário de Manaus
-        document.getElementById('inputData').value = now.toISOString().slice(0, 16);
+
         
         // Função para buscar os dados do backend
         async function fetchSamples() {
@@ -204,7 +201,8 @@
             listTableBody.innerHTML = '';
             samples.forEach(sample => {
                 const row = listTableBody.insertRow();
-                row.insertCell(0).textContent = new Date(sample.inputData).toLocaleString('pt-BR');
+                //row.insertCell(0).textContent = sample.inputData).toLocaleString('pt-BR');
+                row.insertCell(0).textContent = sample.inputData;    
                 row.insertCell(1).textContent = sample.inspectionLot;
                 row.insertCell(2).textContent = sample.plantNumber;
                 row.insertCell(3).textContent = sample.location;
@@ -222,8 +220,8 @@
                     'status-finalized'
                 );
                 row.insertCell(9).textContent = sample.iqcCollaborator;
-                row.insertCell(10).textContent = sample.finishTime ? new Date(sample.finishTime).toLocaleString('pt-BR') : '---';
-
+                //row.insertCell(10).textContent = sample.finishTime ? new Date(sample.finishTime).toLocaleString('pt-BR') : '---';
+                row.insertCell(10).textContent = sample.finishTime;
                 // Ações (Alterar/Excluir)
                 const actionsCell = row.insertCell(11);
                 const editButton = document.createElement('button');
