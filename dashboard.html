@@ -211,6 +211,10 @@
             return date.toISOString().slice(0,16);
         }
 
+        const now = new Date () ;
+        now.setHours(now.getUTCHours() -8);
+        document.getElementById('inputData').value = now.toISOString().slice(0,16);
+
         // Função para buscar os dados da API
         function loadSamples() {
             return fetch('https://52.67.36.220/samples')  // Rota correta para buscar os dados
@@ -271,7 +275,7 @@
                 statusCell.classList.add(sample.status === 'Em Processo de Inspeção' ? 'status-in-progress' : sample.status === 'Pendente de Inspeção' ? 'status-pending' : 'status-finalized');
 
                 row.insertCell(9).textContent = sample.iqcCollaborator;
-                row.insertCell(10).textContent = sample.finishTime ? formatDate(sample.finishTime) : '---';
+                row.insertCell(10).textContent = sample.finishTime ? now(sample.finishTime) : '---';
             });
 
             // Atualizar os valores no dashboard
