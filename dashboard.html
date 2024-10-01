@@ -287,8 +287,9 @@
                 return counts;
             }, {});
 
-         /*   const chart = JSC.chart('chartDiv', {
-                title_label_text: 'Inspeções por Status',
+            const chart = JSC.chart('chartDiv', {
+            type: pie donut,   
+title_label_text: 'Inspeções por Status',
                 series: [
                     {
                         points: Object.keys(statusCounts).map(status => ({
@@ -297,7 +298,7 @@
                         }))
                     }
                 ]
-            });*/
+            });
 
             // Gráfico de amostras por status
             const planCounts = samples.reduce((counts, sample) => {
@@ -309,7 +310,7 @@
                 return counts;
             }, { completed: 0, inProgress: 0 });
 
-           /* const chart2 = JSC.chart('chartDiv2', {
+            const chart2 = JSC.chart('chartDiv2', {
                 title_label_text: 'Amostras por Status',
                 series: [
                     {
@@ -320,9 +321,9 @@
                     }
                 ]
             });
-        }  */
+        }  
 
-                //Gráficos
+           /*     //Gráficos
             JSC.Chart('chartDiv', {
             box: {
             padding: 10,
@@ -378,7 +379,7 @@
             ]
             }
             ]
-            });
+            });/*
 
 
         // Carregar os dados assim que a página carregar
