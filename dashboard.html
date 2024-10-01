@@ -288,7 +288,6 @@ document.getElementById('pendingItems').textContent = pendingItems;
 
         const chart = JSC.chart('chartDiv', {
             title_label_text: 'Inspeções por Status',
-            type: pie, 
             series: [
                 {
                     points: Object.keys(statusCounts).map(status => ({
