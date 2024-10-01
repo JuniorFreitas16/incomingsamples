@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
             color: #333;
+            padding: 20px;
         }
 
         .container {
@@ -23,9 +24,10 @@
 
         .navigation {
             padding: 20px;
-            background-color: #0033a0;
+            background-color: #0033a0; /* Royal Blue */
             color: white;
             text-align: left;
+            margin-bottom: 20px;
         }
 
         .navigation a {
@@ -39,45 +41,9 @@
             text-decoration: underline;
         }
 
-        @media                 
-            (max-width: 600px){
-                .container{
-                width: 100%;
-                padding: 10px;
-                }
-                .table{
-                    width: 700px;
-                    padding: 10px;
-                    overflow-x: auto; /* Permite rolagem         horizontal */
-                }}
-
         h1 {
             text-align: center;
-            color: #0033a0;
-        }
-
-        #filters {
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        #filters input {
-            width: 120px;
-            margin-left: 10px;
-        }
-
-        #filters div {
-            width: 100%;
-            align-items: center;
-        }
-
-        .table {
-            width: 98%;
-            margin-top: 10px;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #0033a0; /* Royal Blue */
         }
 
         table {
@@ -87,7 +53,7 @@
         }
 
         table, th, td {
-            border: 1px solid #ddd;
+            border: 1px solid black;
         }
 
         th, td {
@@ -119,209 +85,160 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-align: right;
-            margin: 2px;
         }
+
+        button:hover {
+            background-color: #001f4d;
+        }
+
+        .export-button {
+            text-align: right;
+            margin: 20px 0;
+        }
+
+        .export-button button {
+            background-color: #002366;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Incoming Inspection VD - Lista de Itens em QMLOT</h1>
-    
     <div class="container">
         <div class="navigation">
             <a href="index.html">Cadastrar Novo Item</a>
             <a href="dashboard.html">Dashboard</a>
         </div>
-        
-        <div id="filters">
-            <label for="filterDate">Data de Input:</label>
-            <input type="date" id="filterDate" name="filterDate">
-        
-            <label for="filterInspectionLot">Inspection Lot:</label>
-            <input type="number" id="filterInspectionLot" name="filterInspectionLot">
-        
-            <label for="filterPlant">Planta:</label>
-            <input type="text" id="filterPlant" name="filterPlant">
-        
-            <label for="filterLocation">Locação:</label>
-            <input type="text" id="filterLocation" name="filterLocation">
-        
-            <label for="filterMaterial">Material:</label>
-            <input type="text" id="filterMaterial" name="filterMaterial">
-        
-            <label for="filterDescription">Descrição:</label>
-            <input type="text" id="filterDescription" name="filterDescription">
-        
-            <label for="filterStatus">Status:</label>
-            <select id="filterStatus" name="filterStatus">
-                <option value="">Todos</option>
-                <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
-                <option value="Pendente de Inspeção">Pendente de Inspeção</option>
-                <option value="Finalizado">Finalizado</option>
-            </select>
-        
-            <label for="filterCollaborator">Colaborador IQC:</label>
-            <input type="text" id="filterCollaborator" name="filterCollaborator">
-        
-            <button onclick="applyFilters()">Aplicar Filtros</button>
-            <button onclick="clearFilters()">Limpar Filtros</button>
-        </div>
-        
-        <div class="table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data Input</th>
-                        <th>Inspection Lot</th>
-                        <th>Número Planta</th>
-                        <th>Locação</th>
-                        <th>Material</th>
-                        <th>Descrição</th>
-                        <th>Qtd Lote</th>
-                        <th>Plano Amostra</th>
-                        <th>Status</th>
-                        <th>Colaborador IQC</th>
-                        <th>Hora de Conclusão</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="listTableBody">
-                    <!-- Os dados da tabela serão preenchidos dinamicamente -->
-                </tbody>
-            </table>
+
+        <h1>Lista de Itens de Inspeção</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Inspection Lot</th>
+                    <th>Número Planta</th>
+                    <th>Locação</th>
+                    <th>Material</th>
+                    <th>Descrição</th>
+                    <th>Qtd Lote</th>
+                    <th>Plano Amostra</th>
+                    <th>Status</th>
+                    <th>Colaborador IQC</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listTableBody">
+                <!-- Os dados da tabela serão preenchidos dinamicamente -->
+            </tbody>
+        </table>
+
+        <div class="export-button">
+            <button id="exportButton">Exportar para Excel</button>
         </div>
     </div>
 
     <script>
+        // Função para carregar os itens da API e renderizar na tabela
+        function loadItems() {
+            fetch('https://52.67.36.220/samples')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('listTableBody');
+                    tableBody.innerHTML = ''; // Limpa o conteúdo anterior
 
-        
-        // Função para buscar os dados do backend
-        async function fetchSamples() {
-            try {
-                const response = await fetch('https://52.67.36.220/samples');
-                const samples = await response.json();
-                updateTable(samples);
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                alert('Erro ao carregar dados do servidor.');
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.inspectionLot}</td>
+                            <td>${item.plantNumber}</td>
+                            <td>${item.location}</td>
+                            <td>${item.material}</td>
+                            <td>${item.description}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.samplePlan}</td>
+                            <td class="${getStatusClass(item.status)}">${item.status}</td>
+                            <td>${item.iqcCollaborator}</td>
+                            <td>
+                                <button onclick="editItem(${item.id})">Editar</button>
+                                <button onclick="deleteItem(${item.id})">Excluir</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar itens:', error);
+                    alert('Erro ao carregar itens.');
+                });
+        }
+
+        // Função para obter a classe de status
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Em Processo de Inspeção':
+                    return 'status-in-progress';
+                case 'Pendente de Inspeção':
+                    return 'status-pending';
+                case 'Finalizado':
+                    return 'status-finalized';
+                default:
+                    return '';
             }
         }
 
-        // Função para atualizar a tabela com os dados do servidor
-        function updateTable(samples) {
-            const listTableBody = document.getElementById('listTableBody');
-            listTableBody.innerHTML = '';
-            samples.forEach(sample => {
-                const row = listTableBody.insertRow();
-                row.insertCell(0).textContent = new Date(sample.inputData).toLocaleString('pt-BR');
-                //row.insertCell(0).textContent = sample.inputData;    
-                row.insertCell(1).textContent = sample.inspectionLot;
-                row.insertCell(2).textContent = sample.plantNumber;
-                row.insertCell(3).textContent = sample.location;
-                row.insertCell(4).textContent = sample.material;
-                row.insertCell(5).textContent = sample.description;
-                row.insertCell(6).textContent = sample.quantity;
-                row.insertCell(7).textContent = sample.samplePlan;
-
-                // Status com cor de destaque
-                const statusCell = row.insertCell(8);
-                statusCell.textContent = sample.status;
-                statusCell.classList.add(
-                    sample.status === 'Em Processo de Inspeção' ? 'status-in-progress' :
-                    sample.status === 'Pendente de Inspeção' ? 'status-pending' :
-                    'status-finalized'
-                );
-                row.insertCell(9).textContent = sample.iqcCollaborator;
-                //row.insertCell(10).textContent = sample.finishTime ? new Date(sample.finishTime).toLocaleString('pt-BR') : '---';
-                row.insertCell(10).textContent = sample.finishTime;
-                // Ações (Alterar/Excluir)
-                const actionsCell = row.insertCell(11);
-                const editButton = document.createElement('button');
-                editButton.textContent = 'Alterar';
-                editButton.addEventListener('click', () => editSample(sample.id));
-                actionsCell.appendChild(editButton);
-
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Excluir';
-                deleteButton.addEventListener('click', () => deleteSample(sample.id));
-                actionsCell.appendChild(deleteButton);
-            });
-        }
-
-        // Função para redirecionar à página de edição
-        function editSample(id) {
+        // Função para redirecionar para a página de edição
+        function editItem(id) {
             window.location.href = `edit.html?id=${id}`;
         }
 
-        // Função para excluir uma amostra
-        async function deleteSample(id) {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
-                try {
-                    await fetch(`https://52.67.36.220/samples/${id}`, { method: 'DELETE' });
-                    alert('Item excluído com sucesso!');
-                    fetchSamples(); // Atualiza a tabela após excluir
-                } catch (error) {
-                    console.error('Erro ao excluir item:', error);
-                    alert('Erro ao excluir item.');
-                }
+        // Função para excluir um item
+        function deleteItem(id) {
+            if (!confirm('Tem certeza que deseja excluir este item?')) {
+                return;
             }
-        }
 
-        // Carregar os dados ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchSamples();
-        });
-
-        // Aplicar filtros na tabela
-        function applyFilters() {
-            const filterDate = document.getElementById('filterDate').value.toLowerCase();
-            const filterInspectionLot = document.getElementById('filterInspectionLot').value.toLowerCase();
-            const filterPlant = document.getElementById('filterPlant').value.toLowerCase();
-            const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
-            const filterMaterial = document.getElementById('filterMaterial').value.toLowerCase();
-            const filterDescription = document.getElementById('filterDescription').value.toLowerCase();
-            const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
-            const filterCollaborator = document.getElementById('filterCollaborator').value.toLowerCase();
-
-            const rows = document.querySelectorAll('#listTableBody tr');
-
-            rows.forEach(row => {
-                const dateCell = row.cells[0].textContent.toLowerCase();
-                const inspectionLotCell = row.cells[1].textContent.toLowerCase();
-                const plantCell = row.cells[2].textContent.toLowerCase();
-                const locationCell = row.cells[3].textContent.toLowerCase();
-                const materialCell = row.cells[4].textContent.toLowerCase();
-                const descriptionCell = row.cells[5].textContent.toLowerCase();
-                const statusCell = row.cells[8].textContent.toLowerCase();
-                const collaboratorCell = row.cells[9].textContent.toLowerCase();
-
-                const matchDate = !filterDate || dateCell.includes(filterDate);
-                const matchInspectionLot = !filterInspectionLot || inspectionLotCell.includes(filterInspectionLot);
-                const matchPlant = !filterPlant || plantCell.includes(filterPlant);
-                const matchLocation = !filterLocation || locationCell.includes(filterLocation);
-                const matchMaterial = !filterMaterial || materialCell.includes(filterMaterial);
-                const matchDescription = !filterDescription || descriptionCell.includes(filterDescription);
-                const matchStatus = !filterStatus || statusCell.includes(filterStatus);
-                const matchCollaborator = !filterCollaborator || collaboratorCell.includes(filterCollaborator);
-
-                row.style.display = (matchDate && matchInspectionLot && matchPlant && matchLocation && matchMaterial && matchDescription && matchStatus && matchCollaborator) ? '' : 'none';
+            fetch(`https://52.67.36.220/samples/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao excluir item.');
+                }
+                alert('Item excluído com sucesso!');
+                loadItems(); // Recarregar a lista de itens após a exclusão
+            })
+            .catch(error => {
+                console.error('Erro ao excluir item:', error);
+                alert('Erro ao excluir item.');
             });
         }
 
-        // Função para limpar os filtros
-        function clearFilters() {
-            document.getElementById('filterDate').value = '';
-            document.getElementById('filterInspectionLot').value = '';
-            document.getElementById('filterPlant').value = '';
-            document.getElementById('filterLocation').value = '';
-            document.getElementById('filterMaterial').value = '';
-            document.getElementById('filterDescription').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterCollaborator').value = '';
-
-            const rows = document.querySelectorAll('#listTableBody tr');
-            rows.forEach(row => row.style.display = '');
+        // Função para exportar a tabela para Excel
+        function exportToExcel() {
+            const table = document.querySelector('table');
+            const tableHTML = table.outerHTML.replace(/ /g, '%20');
+            const filename = 'samples_data.xls';
+            const downloadLink = document.createElement('a');
+            downloadLink.href = 'data:application/vnd.ms-excel,' + tableHTML;
+            downloadLink.download = filename;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
+
+        // Carregar os itens ao iniciar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadItems();
+
+            // Configura o botão de exportação para Excel
+            document.getElementById('exportButton').addEventListener('click', exportToExcel);
+        });
     </script>
 </body>
 </html>
