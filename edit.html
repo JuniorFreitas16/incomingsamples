@@ -137,7 +137,7 @@
             }
 
             // Buscar dados do item via API
-            fetch(`http://52.67.36.220:3000/samples/${id}`)
+            fetch(`https://52.67.36.220/samples/${id}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Erro ao carregar item');
