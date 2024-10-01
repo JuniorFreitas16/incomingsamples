@@ -22,20 +22,6 @@
             overflow: auto;
         }
 
-  
-        @media                 
-            (max-width: 600px){
-                .container{
-                width: 100%;
-                padding: 10px;
-                }
-                .table{
-                    width: 700px;
-                    padding: 10px;
-                    overflow-x: auto; /* Permite rolagem horizontal */
-                }}
-
-
         .navigation {
             padding: 20px;
             background-color: #0033a0; /* Royal Blue */
@@ -57,7 +43,7 @@
 
         h1 {
             text-align: center;
-            color: #0033a0; /* Royal Blue */
+            color: #0033a0;
         }
 
         table {
@@ -119,6 +105,19 @@
             cursor: pointer;
         }
 
+        #filters input {
+            width: 120px;
+            margin-left: 10px;
+        }
+
+        #filters div {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -129,6 +128,42 @@
         </div>
 
         <h1>Lista de Itens de Inspeção</h1>
+
+        <!-- Filtros de busca -->
+        <div id="filters">
+            <div>
+                <label for="filterDate">Data de Input:</label>
+                <input type="date" id="filterDate">
+
+                <label for="filterInspectionLot">Inspection Lot:</label>
+                <input type="number" id="filterInspectionLot">
+
+                <label for="filterPlant">Número Planta:</label>
+                <input type="text" id="filterPlant">
+
+                <label for="filterLocation">Locação:</label>
+                <input type="text" id="filterLocation">
+            </div>
+
+            <div>
+                <label for="filterMaterial">Material:</label>
+                <input type="text" id="filterMaterial">
+
+                <label for="filterStatus">Status:</label>
+                <select id="filterStatus">
+                    <option value="">Todos</option>
+                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+
+                <label for="filterCollaborator">Colaborador IQC:</label>
+                <input type="text" id="filterCollaborator">
+
+                <button onclick="applyFilters()">Aplicar Filtros</button>
+                <button onclick="clearFilters()">Limpar Filtros</button>
+            </div>
+        </div>
 
         <table>
             <thead>
@@ -157,39 +192,47 @@
     </div>
 
     <script>
+        let allItems = []; // Variável para armazenar todos os itens carregados da API
+
         // Função para carregar os itens da API e renderizar na tabela
         function loadItems() {
             fetch('https://52.67.36.220/samples')
                 .then(response => response.json())
                 .then(data => {
-                    const tableBody = document.getElementById('listTableBody');
-                    tableBody.innerHTML = ''; // Limpa o conteúdo anterior
-
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${item.id}</td>
-                            <td>${item.inspectionLot}</td>
-                            <td>${item.plantNumber}</td>
-                            <td>${item.location}</td>
-                            <td>${item.material}</td>
-                            <td>${item.description}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.samplePlan}</td>
-                            <td class="${getStatusClass(item.status)}">${item.status}</td>
-                            <td>${item.iqcCollaborator}</td>
-                            <td>
-                                <button onclick="editItem(${item.id})">Editar</button>
-                                <button onclick="deleteItem(${item.id})">Excluir</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+                    allItems = data; // Armazenar todos os itens carregados
+                    renderItems(allItems);
                 })
                 .catch(error => {
                     console.error('Erro ao carregar itens:', error);
                     alert('Erro ao carregar itens.');
                 });
+        }
+
+        // Função para renderizar itens na tabela
+        function renderItems(items) {
+            const tableBody = document.getElementById('listTableBody');
+            tableBody.innerHTML = ''; // Limpa o conteúdo anterior
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.inspectionLot}</td>
+                    <td>${item.plantNumber}</td>
+                    <td>${item.location}</td>
+                    <td>${item.material}</td>
+                    <td>${item.description}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.samplePlan}</td>
+                    <td class="${getStatusClass(item.status)}">${item.status}</td>
+                    <td>${item.iqcCollaborator}</td>
+                    <td>
+                        <button onclick="editItem(${item.id})">Editar</button>
+                        <button onclick="deleteItem(${item.id})">Excluir</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
 
         // Função para obter a classe de status
@@ -204,6 +247,45 @@
                 default:
                     return '';
             }
+        }
+
+        // Função para aplicar os filtros na tabela
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value.toLowerCase();
+            const filterInspectionLot = document.getElementById('filterInspectionLot').value.toLowerCase();
+            const filterPlant = document.getElementById('filterPlant').value.toLowerCase();
+            const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
+            const filterMaterial = document.getElementById('filterMaterial').value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
+            const filterCollaborator = document.getElementById('filterCollaborator').value.toLowerCase();
+
+            const filteredItems = allItems.filter(item => {
+                const dateMatch = !filterDate || item.inputData.toLowerCase().includes(filterDate);
+                const inspectionLotMatch = !filterInspectionLot || item.inspectionLot.toLowerCase().includes(filterInspectionLot);
+                const plantMatch = !filterPlant || item.plantNumber.toLowerCase().includes(filterPlant);
+                const locationMatch = !filterLocation || item.location.toLowerCase().includes(filterLocation);
+                const materialMatch = !filterMaterial || item.material.toLowerCase().includes(filterMaterial);
+                const statusMatch = !filterStatus || item.status.toLowerCase().includes(filterStatus);
+                const collaboratorMatch = !filterCollaborator || item.iqcCollaborator.toLowerCase().includes(filterCollaborator);
+
+                return dateMatch && inspectionLotMatch && plantMatch && locationMatch && materialMatch && statusMatch && collaboratorMatch;
+            });
+
+            renderItems(filteredItems); // Renderizar os itens filtrados
+        }
+
+        // Função para limpar os filtros e mostrar todos os itens
+        function clearFilters()// Função para limpar os filtros e mostrar todos os itens
+        function clearFilters() {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterInspectionLot').value = '';
+            document.getElementById('filterPlant').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('filterMaterial').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterCollaborator').value = '';
+
+            renderItems(allItems); // Exibe todos os itens sem filtros
         }
 
         // Função para redirecionar para a página de edição
