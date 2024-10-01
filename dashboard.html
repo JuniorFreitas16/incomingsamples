@@ -18,10 +18,11 @@
                 padding: 10px;
             }
             #filters div{
-                width:90%;
+                width: 90%;
                 flex-wrap: wrap;
+            }
         }
-} 
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f8;
@@ -147,6 +148,11 @@
             align-items: center;
             margin-bottom: 10px;
         }
+
+        .filters-container{
+            width: 100%;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -212,41 +218,43 @@
                 </tbody>
             </table>
         </div>
-        <!-- Filtros de busca -->
-        <div id="filters">
-            <div>
-                <label for="filterDate">Data de Input:</label>
-                <input type="date" id="filterDate">
+                <!-- Filtros de busca -->
+        <div class="filters-container">
+                <div id="filters">
+                    <div>
+                        <label for="filterDate">Data de Input:</label>
+                        <input type="date" id="filterDate">
 
-                <label for="filterInspectionLot">Inspection Lot:</label>
-                <input type="number" id="filterInspectionLot">
+                        <label for="filterInspectionLot">Inspection Lot:</label>
+                        <input type="number" id="filterInspectionLot">
 
-                <label for="filterPlant">Número Planta:</label>
-                <input type="text" id="filterPlant">
+                        <label for="filterPlant">Número Planta:</label>
+                        <input type="text" id="filterPlant">
 
-                <label for="filterLocation">Locação:</label>
-                <input type="text" id="filterLocation">
-            </div>
+                        <label for="filterLocation">Locação:</label>
+                        <input type="text" id="filterLocation">
+                    </div>
 
-            <div>
-                <label for="filterMaterial">Material:</label>
-                <input type="text" id="filterMaterial">
+                    <div>
+                        <label for="filterMaterial">Material:</label>
+                        <input type="text" id="filterMaterial">
 
-                <label for="filterStatus">Status:</label>
-                <select id="filterStatus">
-                    <option value="">Todos</option>
-                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
-                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
-                    <option value="Finalizado">Finalizado</option>
-                </select>
+                        <label for="filterStatus">Status:</label>
+                        <select id="filterStatus">
+                            <option value="">Todos</option>
+                            <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                            <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
 
-                <label for="filterCollaborator">Colaborador IQC:</label>
-                <input type="text" id="filterCollaborator">
+                        <label for="filterCollaborator">Colaborador IQC:</label>
+                        <input type="text" id="filterCollaborator">
 
-                <button onclick="applyFilters()">Aplicar Filtros</button>
-                <button onclick="clearFilters()">Limpar Filtros</button>
-            </div>
-        </div>
+                        <button onclick="applyFilters()">Aplicar Filtros</button>
+                        <button onclick="clearFilters()">Limpar Filtros</button>
+                    </div>
+                </div>
+        </div>        
     </div>
 
     <script>
