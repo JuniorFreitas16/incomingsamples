@@ -279,7 +279,7 @@
             document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
         }
 
-        // Função para renderizar os gráficos
+     /*   // Função para renderizar os gráficos
         function renderCharts(samples) {
             // Gráfico de status das inspeções
             const statusCounts = samples.reduce((counts, sample) => {
@@ -320,7 +320,66 @@
                     }
                 ]
             });
-        }
+        }  */
+
+                //Gráficos
+            JSC.Chart('chartDiv', {
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            palette: ['#4169E1', '#FF0000', '#00FA9A'],
+            title: {
+            label_text: 'Inspeções',
+            position: 'center',
+            },
+            legend_visible: false,
+            defaultSeries: {
+            type: 'pie donut',
+            angle_orientation: 125,
+            shape_padding: 2,
+            mouseTracking_enabled: true
+            },
+            defaultPoint: {
+            label: {
+            text: '%name : %yValue',
+            margin: 10
+            }},
+            series: [
+            {
+            points: [
+            {x: 'Em andamento', y: inProgressSamples},
+            {x: 'Pendentes', y: pendingItems},
+            {x: 'Finalizados', y: completedSamples}
+            ]
+            }
+            ]
+            });
+
+            JSC.Chart('chartDiv2', {
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            type: 'column',
+            title_label_text: 'Amostras',
+            title_position: 'center', 
+            legend_visible: false, 
+            defaultPoint: {
+            label: {
+            text: '{%yValue:n1}%',
+            margin: 10
+            }},
+            series: [
+            {
+            points: [
+            {x: 'Em inspeção', y: (samplePlanInProgress/(samplePlanCompleted+samplePlanInProgress))*100 },
+            {x: 'Liberadas', y: (samplePlanCompleted/(samplePlanCompleted+samplePlanInProgress))*100  }
+            ]
+            }
+            ]
+            });
+
 
         // Carregar os dados assim que a página carregar
         document.addEventListener('DOMContentLoaded', () => {
