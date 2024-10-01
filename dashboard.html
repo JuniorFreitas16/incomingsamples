@@ -208,7 +208,7 @@
         // Função para formatar a data de forma legível
         function formatDate(dateTimeString) {
             const date = new Date(dateTimeString);
-            return date.toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+            return date.toISOString().slice(0,16);
         }
 
         // Função para buscar os dados da API
@@ -256,7 +256,7 @@
                 }
 
                 const row = dashboardTableBody.insertRow();
-                row.insertCell(0).textContent = sample.inputData;
+                row.insertCell(0).textContent = formatDate(sample.inputData);
                 row.insertCell(1).textContent = sample.inspectionLot;
                 row.insertCell(2).textContent = sample.plantNumber;
                 row.insertCell(3).textContent = sample.location;
