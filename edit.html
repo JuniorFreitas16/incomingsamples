@@ -121,7 +121,7 @@
     </div>
 
     <script>
-        // Função para obter o parâmetro 'id' da URL
+        // Função para obter parâmetros da URL (neste caso, o ID)
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
@@ -136,7 +136,7 @@
                 return;
             }
 
-            // Buscar os dados do item via API
+            // Buscar dados do item pela API
             fetch(`https://52.67.36.220/samples/${id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -146,8 +146,7 @@
                 })
                 .then(sample => {
                     // Preencher o formulário com os dados do item
-                    //document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
-                    document.getElementById('inputData').value = sample.inputData;
+                    document.getElementById('inputData').value = new Date(sample.inputData).toISOString().slice(0, 16);
                     document.getElementById('inspectionLot').value = sample.inspectionLot;
                     document.getElementById('plantNumber').value = sample.plantNumber;
                     document.getElementById('location').value = sample.location;
@@ -182,7 +181,7 @@
                     finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
                 };
 
-                // Enviar os dados atualizados para a API usando o método PUT
+                // Enviar os dados atualizados para a API (PUT)
                 fetch(`https://52.67.36.220/samples/${id}`, {
                     method: 'PUT',
                     headers: {
@@ -198,7 +197,7 @@
                 })
                 .then(data => {
                     alert('Item atualizado com sucesso!');
-                    window.location.href = 'list.html';  // Redireciona para a lista de itens após a atualização
+                    window.location.href = 'list.html';  // Redireciona para a lista após a atualização
                 })
                 .catch(error => {
                     console.error('Erro ao atualizar item:', error);
