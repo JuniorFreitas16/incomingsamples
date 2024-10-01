@@ -201,8 +201,8 @@
             listTableBody.innerHTML = '';
             samples.forEach(sample => {
                 const row = listTableBody.insertRow();
-                //row.insertCell(0).textContent = sample.inputData).toLocaleString('pt-BR');
-                row.insertCell(0).textContent = sample.inputData;    
+                row.insertCell(0).textContent = new Date(sample.inputData).toLocaleString('pt-BR');
+                //row.insertCell(0).textContent = sample.inputData;    
                 row.insertCell(1).textContent = sample.inspectionLot;
                 row.insertCell(2).textContent = sample.plantNumber;
                 row.insertCell(3).textContent = sample.location;
