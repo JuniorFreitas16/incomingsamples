@@ -328,7 +328,7 @@ document.getElementById('pendingItems').textContent = pendingItems;
         const planCounts = samples.reduce((counts, sample) => {
             if (sample.status === 'Finalizado') {
                 counts.completed += parseInt(sample.samplePlan) || 0;
-            } else if (sample.status === 'Em Processo de Inspeção') {
+            } else if (sample.status === 'Em Inspeção') {
                 counts.inProgress += parseInt(sample.samplePlan) || 0;
             }
             return counts;
