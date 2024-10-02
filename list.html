@@ -11,11 +11,11 @@
                 width: 100%;
                 padding: 10px;
                 }
-                table{
+               .tables{
                     width: 100%;
                     padding: 10px;
                     flex-wrap: wrap;
-                    overflow-x: auto; /* Permite rolagem         horizontal */
+                    overflow-x: auto;
                 }
                 #filters div{
                 width: 100%;
@@ -184,7 +184,7 @@
                 <button onclick="clearFilters()">Limpar Filtros</button>
             </div>
         </div>
-
+     <div class="tables">
         <table>
             <thead>
                 <tr>
@@ -207,7 +207,7 @@
                 <!-- Os dados da tabela serão preenchidos dinamicamente -->
             </tbody>
         </table>
-
+     </div>
         <div class="export-button">
             <button id="exportButton">Exportar para Excel</button>
         </div>
