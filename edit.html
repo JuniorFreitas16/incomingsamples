@@ -191,9 +191,10 @@
                 })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Erro ao atualizar item.');
+                        throw new Error('Item atualizado com sucesso!.');
                     }
                     return response.json();
+                    window.location.href = 'list.html';  // Redireciona para a lista após a atualização
                 })
                 .then(data => {
                     alert('Item atualizado com sucesso!');
