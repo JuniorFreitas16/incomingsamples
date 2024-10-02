@@ -13,6 +13,7 @@
                 }
                .tables{
                     width: 100%;
+                    margin: auto;
                     padding: 10px;
                     flex-wrap: wrap;
                     overflow-x: auto;
@@ -149,7 +150,36 @@
             <a href="index.html">Cadastrar Novo Item</a>
             <a href="dashboard.html">Dashboard</a>
         </div>
+       <div class="export-button">
+            <button id="exportButton">Exportar para Excel</button>
+        </div>
 
+     <div class="tables">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Data Input</th>
+                    <th>Inspection Lot</th>
+                    <th>Número Planta</th>
+                    <th>Locação</th>
+                    <th>Material</th>
+                    <th>Descrição</th>
+                    <th>Qtd Lote</th>
+                    <th>Plano Amostra</th>
+                    <th>Status</th>
+                    <th>Colaborador IQC</th>
+                    <th>Hora de Conclusão</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listTableBody">
+                <!-- Os dados da tabela serão preenchidos dinamicamente -->
+            </tbody>
+        </table>
+     </div>
+ 
+      
         <!-- Filtros de busca -->
         <div id="filters">
             <div>
@@ -184,33 +214,6 @@
                 <button onclick="applyFilters()">Aplicar Filtros</button>
                 <button onclick="clearFilters()">Limpar Filtros</button>
             </div>
-        </div>
-     <div class="tables">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Data Input</th>
-                    <th>Inspection Lot</th>
-                    <th>Número Planta</th>
-                    <th>Locação</th>
-                    <th>Material</th>
-                    <th>Descrição</th>
-                    <th>Qtd Lote</th>
-                    <th>Plano Amostra</th>
-                    <th>Status</th>
-                    <th>Colaborador IQC</th>
-                    <th>Hora de Conclusão</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listTableBody">
-                <!-- Os dados da tabela serão preenchidos dinamicamente -->
-            </tbody>
-        </table>
-     </div>
-        <div class="export-button">
-            <button id="exportButton">Exportar para Excel</button>
         </div>
     </div>
 
