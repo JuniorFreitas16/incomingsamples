@@ -231,7 +231,7 @@
         // Configuração da data de Manaus no campo de data
         const now = new Date();
         now.setHours(now.getUTCHours() - 8);  // Ajuste para o fuso horário de Manaus
-        document.getElementById('inputData').value = now.toISOString().slice(0, 16);
+        //document.getElementById('inputData').value = now.toISOString().slice(0, 16);
         
         // Função para renderizar itens na tabela
         function renderItems(items) {
@@ -242,7 +242,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${item.id}</td>
-                    <td>${item.inputData(now)}</td>
+                    <td>${(item.inputData).toISOString().slice(0, 16)}</td>
                     <td>${item.inspectionLot}</td>
                     <td>${item.plantNumber}</td>
                     <td>${item.location}</td>
