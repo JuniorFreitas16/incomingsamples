@@ -255,7 +255,7 @@
                     <td>${item.samplePlan}</td>
                     <td class="${getStatusClass(item.status)}">${item.status}</td>
                     <td>${item.iqcCollaborator}</td>
-                    <td>${item.finishTime ? formatDate(sample.finishTime) : '---'}</td>
+                    <td>${item.finishTime ? formatDate(item.finishTime) : '---'}</td>
                     <td>
                         <button onclick="editItem(${item.id})">Editar</button>
                         <button onclick="deleteItem(${item.id})">Excluir</button>
