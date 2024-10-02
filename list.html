@@ -186,6 +186,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Data Input</th>
                     <th>Inspection Lot</th>
                     <th>Número Planta</th>
                     <th>Locação</th>
@@ -195,6 +196,7 @@
                     <th>Plano Amostra</th>
                     <th>Status</th>
                     <th>Colaborador IQC</th>
+                    <th>Hora de Conclusão</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -234,6 +236,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${item.id}</td>
+                    <td>${item.inputData}</td>
                     <td>${item.inspectionLot}</td>
                     <td>${item.plantNumber}</td>
                     <td>${item.location}</td>
@@ -243,6 +246,7 @@
                     <td>${item.samplePlan}</td>
                     <td class="${getStatusClass(item.status)}">${item.status}</td>
                     <td>${item.iqcCollaborator}</td>
+                    <td>${item.finishTime}</td>
                     <td>
                         <button onclick="editItem(${item.id})">Editar</button>
                         <button onclick="deleteItem(${item.id})">Excluir</button>
