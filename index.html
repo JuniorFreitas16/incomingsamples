@@ -205,6 +205,25 @@
             }
         }
 
+        document.getElementById('quantity').addEventListener ('input', function() {
+        const quantity = parseInt(this.value);
+        let samplePlan;
+
+        if (quantity <= 1200) {
+           samplePlan = 13;
+       } else if (quantity <= 32000) {
+           samplePlan = 50;
+       } else if (quantity <= 50000) {
+           samplePlan = 80;
+       } else if (quantity <= 500000) {
+           samplePlan = 125;
+       } else { 
+           samplePlan = 'N/A';
+
+       document.getElementById('samplePlan').value = samplePlan ;
+           
+
+
         // Submeter o formulário de dados
         document.getElementById('itemForm').addEventListener('submit', function(event) {
             event.preventDefault();
