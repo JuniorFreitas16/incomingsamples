@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Inspection VD - Sample Overview</title>
+    <style>
+        @media (max-width: 600px){
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+            .table {
+                overflow-x: auto; /* Permite rolagem horizontal */
+            }
+            .stats {
+                width: 100%;
+                padding: 10px;
+            }
+            #filters div{
+                width: 90%;
+                flex-wrap: wrap;
+                flex-direction: column;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .navigation {
+            padding: 20px;
+            background-color: #0033a0; /* Royal Blue */
+            color: white;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0033a0; /* Royal Blue */
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats {
+            width: 100%;
+            display: inline-flex;
+            flex-direction: initial;
+            flex-wrap: wrap;
+            margin: auto;
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            margin: 5px;
+        }
+
+        .export-button {
+            text-align: right;
+            margin: 20px 0;
+        }
+
+        .export-button button {
+            background-color: #002366;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            display: block;
+            width: 100%;
+            height: 300px;
+            border-collapse: collapse;
+            margin-top: 0px;
+            flex-wrap: wrap;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            justify-content: center;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            width: 9%;
+        }
+
+        th {
+            background-color: #0033a0; /* Royal Blue */
+            color: white;
+        }
+
+       .table2{
+            display: block;
+            width: 100%;
+            height: 80px;
+            border-collapse: collapse;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            overflow-x: auto;
+            text-align: center;
+            border: 1px solid #ddd;
+            justify-content: center;
+        } 
+
+        .status-in-progress {
+            color: blue;
+        }
+
+        .status-pending {
+            color: red;
+        }
+
+        .status-finalized {
+            color: green;
+        }
+
+        .graphics {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #filters input {
+            width: 120px;
+            margin-left: 10px;
+        }
+
+        #filters div {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .filters-container{
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Incoming Inspection VD - Sample Overview</h1>
+    <div class="container">
+        <div class="navigation">
+            //<a href="index.html">Cadastrar Novo Item</a>
+            //<a href="list.html">Lista de Itens</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h2 id="totalSamples">0</h2>
+                <p>Total de Inspeções</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="inProgressSamples">0</h2>
+                <p>Inspeções em Andamento</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="pendingItems">0</h2>
+                <p>Itens Pendentes</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="completedSamples">0</h2>
+                <p>Inspeções Finalizadas</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="samplePlanInProgress">0</h2>
+                <p>Amostras em Inspeção</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="samplePlanCompleted">0</h2>
+                <p>Amostras liberadas</p>
+            </div>
+        </div>
+        
+        <div class="graphics">
+            <div id="chartDiv" style="width:50%; height:300px; margin:0 auto; text-align: center;"></div>
+            <div id="chartDiv2" style="width:50%; height:300px; margin:0 auto;"></div>
+        </div>
+        
+        <div class="table-container">
+              <table class='table2'>
+                <thead>
+                    <tr>
+                        <th>Data Input</th>
+                        <th>Inspection Lot</th>
+                        <th>Número Planta</th>
+                        <th>Locação</th>
+                        <th>Material</th>
+                        <th>Descrição</th>
+                        <th>Qtd Lote</th>
+                        <th>Plano Amostra</th>
+                        <th>Status</th>
+                        <th>Colaborador IQC</th>
+                        <th>Hora de Conclusão</th>
+                    </tr>
+                </thead>
+             </table>
+           <table>
+
+                <tbody id="dashboardTableBody">
+                    <!-- Os dados da tabela serão preenchidos dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+                <!-- Filtros de busca -->
+        <div class="filters-container">
+                <div id="filters">
+                    <div>
+                        <label for="filterDate">Data de Input:</label>
+                        <input type="date" id="filterDate">
+
+                        <label for="filterInspectionLot">Inspection Lot:</label>
+                        <input type="number" id="filterInspectionLot">
+
+                        <label for="filterPlant">Número Planta:</label>
+                        <input type="text" id="filterPlant">
+
+                        <label for="filterLocation">Locação:</label>
+                        <input type="text" id="filterLocation">
+                    </div>
+
+                    <div>
+                        <label for="filterMaterial">Material:</label>
+                        <input type="text" id="filterMaterial">
+
+                        <label for="filterStatus">Status:</label>
+                        <select id="filterStatus">
+                            <option value="">Todos</option>
+                            <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                            <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+
+                        <label for="filterCollaborator">Colaborador IQC:</label>
+                        <input type="text" id="filterCollaborator">
+
+                        <button onclick="applyFilters()">Aplicar Filtros</button>
+                        <button onclick="clearFilters()">Limpar Filtros</button>
+                    </div>
+                </div>
+        </div>        
+    </div>
+
+    <script>
+        let allSamples = []; // Armazena todas as amostras carregadas da API
+
+        function formatDate(dateTimeString) {
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+        }
+
+        // Carregar as amostras da API
+        function loadSamples() {
+            return fetch('https://52.67.36.220/samples')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar os dados do servidor');
+                    }
+                    return response.json();
+                })
+                .then(samples => {
+                    allSamples = samples; // Armazenar todos os dados carregados
+                    updateDashboard(samples); // Atualizar contadores e gráficos
+                    renderSamples(samples); // Exibir os itens na tabela
+                    renderCharts(samples); // Exibir gráficos
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados:', error);
+                    alert('Erro ao carregar dados do servidor.');
+                });
+        }
+
+        // Função para renderizar amostras na tabela
+        function renderSamples(samples) {
+            const dashboardTableBody = document.getElementById('dashboardTableBody');
+            dashboardTableBody.innerHTML = ''; // Limpar a tabela antes de renderizar
+
+            samples.forEach(sample => {
+                const row = dashboardTableBody.insertRow();
+                row.insertCell(0).textContent = new Date(sample.inputData).toISOString().slice(0, 16);
+                row.insertCell(1).textContent = sample.inspectionLot;
+                row.insertCell(2).textContent = sample.plantNumber;
+                row.insertCell(3).textContent = sample.location;
+                row.insertCell(4).textContent = sample.material;
+                row.insertCell(5).textContent = sample.description;
+                row.insertCell(6).textContent = sample.quantity;
+                row.insertCell(7).textContent = sample.samplePlan;
+
+                // Atribuir uma classe de cor ao status
+                const statusCell = row.insertCell(8);
+                statusCell.textContent = sample.status;
+                statusCell.classList.add(sample.status === 'Em Processo de Inspeção' ? 'status-in-progress' :
+                    sample.status === 'Pendente de Inspeção' ? 'status-pending' : 'status-finalized');
+
+                row.insertCell(9).textContent = sample.iqcCollaborator;
+                row.insertCell(10).textContent = sample.finishTime ? formatDate(sample.finishTime) : '---';
+            });
+        }
+
+        // Função para atualizar os contadores no dashboard
+        function updateDashboard(samples) {
+            let totalSamples = samples.length;
+            let inProgressSamples = samples.filter(sample => sample.status === 'Em Processo de Inspeção').length;
+            let pendingItems = samples.filter(sample => sample.status === 'Pendente de Inspeção').length;
+            let completedSamples = samples.filter(sample => sample.status === 'Finalizado').length;
+
+            document.getElementById('totalSamples').textContent = totalSamples;
+            document.getElementById('inProgressSamples').textContent = inProgressSamples;
+            document.getElementById('pendingItems').textContent = pendingItems;
+            document.getElementById('completedSamples').textContent = completedSamples;
+
+            // Atualizar contadores de amostras baseados no plano de amostra
+            let samplePlanInProgress = samples
+                .filter(sample => sample.status === 'Em Processo de Inspeção')
+                .reduce((acc, sample) => acc + (parseInt(sample.samplePlan) || 0), 0);
+
+            let samplePlanCompleted = samples
+                .filter(sample => sample.status === 'Finalizado')
+                .reduce((acc, sample) => acc + (parseInt(sample.samplePlan) || 0), 0);
+
+            document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
+            document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
+        }
+
+        // Função para aplicar filtros nas amostras
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value.toLowerCase();
+            const filterInspectionLot = document.getElementById('filterInspectionLot').value.toLowerCase();
+            const filterPlant = document.getElementById('filterPlant').value.toLowerCase();
+            const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
+            const filterMaterial = document.getElementById('filterMaterial').value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
+            const filterCollaborator = document.getElementById('filterCollaborator').value.toLowerCase();
+
+            const filteredSamples = allSamples.filter(sample => {
+                const dateMatch = !filterDate || sample.inputData.toLowerCase().includes(filterDate);
+                const inspectionLotMatch = !filterInspectionLot || sample.inspectionLot.toLowerCase().includes(filterInspectionLot);
+                const plantMatch = !filterPlant || sample.plantNumber.toLowerCase().includes(filterPlant);
+                const locationMatch = !filterLocation || sample.location.toLowerCase().includes(filterLocation);
+                const materialMatch = !filterMaterial || sample.material.toLowerCase().includes(filterMaterial);
+                const statusMatch = !filterStatus || sample.status.toLowerCase().includes(filterStatus);
+                const collaboratorMatch = !filterCollaborator || sample.iqcCollaborator.toLowerCase().includes(filterCollaborator);
+
+                return dateMatch && inspectionLotMatch && plantMatch && locationMatch && materialMatch && statusMatch && collaboratorMatch;
+            });
+
+            renderSamples(filteredSamples); // Renderizar as amostras filtradas
+            updateDashboard(filteredSamples); // Atualizar os contadores com os dados filtrados
+        }
+
+        // Função para limpar filtros e mostrar todas as amostras
+        function clearFilters() {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterInspectionLot').value = '';
+            document.getElementById('filterPlant').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('filterMaterial').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterCollaborator').value = '';
+
+            renderSamples(allSamples); // Exibir todas as amostras
+            updateDashboard(allSamples); // Atualizar os contadores com todas as amostras
+        }
+
+// Função para renderizar os gráficos
+function renderCharts(samples) {
+        // Gráfico de status das inspeções
+        const statusCounts = samples.reduce((counts, sample) => {
+            counts[sample.status] = (counts[sample.status] || 0) + 1;
+            return counts;
+        }, {});
+
+        const chart = JSC.chart('chartDiv', {
+            title_label_text: 'Inspeções',
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            palette: ['#4169E1', '#0040FF', '#86878A'],
+            title: {
+            label_text: 'Inspeções',
+            position: 'center',
+            },
+            legend_visible: true, 
+            legend_position: 'bottom', 
+            defaultSeries: {
+            type: 'pie',
+            angle_orientation: 125,
+            shape_padding: 2,
+            mouseTracking_enabled: true
+            },
+            defaultPoint: {
+            label: {
+            text: '%yValue',
+            margin: 10
+            }},
+            series: [
+                {
+                    points: Object.keys(statusCounts).map(status => ({
+                        x: status,
+                        y: statusCounts[status]
+                    }))
+                }
+            ]
+        });
+
+        // Gráfico de amostras por status
+        const planCounts = samples.reduce((counts, sample) => {
+            if (sample.status === 'Finalizado') {
+                counts.completed += parseInt(sample.samplePlan) || 0;
+            } else if (sample.status === 'Em Processo de Inspeção') {
+                counts.inProgress += parseInt(sample.samplePlan) || 0;
+            }
+            return counts;
+        }, { completed: 0, inProgress: 0 });
+
+        const chart2 = JSC.chart('chartDiv2', {
+            title_label_text: 'Amostras',
+            box: {
+            radius: 5,
+            fill: '#e5f6ff'},
+            title: {
+            label_text: 'Amostras',
+            position: 'center',
+            }, 
+            type: 'column', 
+            label_text: 'Amostras',
+            position: 'center', 
+            legend_visible: false, 
+            defaultPoint:{
+            label: {
+            text: '{%yValue:n1}%',
+            margin: 10
+            }}, 
+            series: [
+                {
+                    points: [
+                        { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress))*100},                        
+                        { x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
+
+                    ]
+                }
+            ]
+        });
+   } 
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamples(); // Carregar as amostras ao abrir a página
+        });
+    </script>
+
+    <!-- Incluindo a biblioteca de gráficos -->
+    <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
+</body>
+</html>
