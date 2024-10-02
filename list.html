@@ -11,9 +11,13 @@
                 padding: 10px;
                 overflow: auto;
                 }
+
+               . container-table{
+                flex-wrap:wrap;
+             }
                 .table{
                 overflow-x: auto;
-                }}
+               } 
                 }
                 #filters div{
                 flex-direction: column;
@@ -188,7 +192,7 @@
                 <button onclick="clearFilters()">Limpar Filtros</button>
             </div>
         </div>
-
+      <div class= "container-table">
         <table>
             <thead>
                 <tr>
@@ -211,7 +215,7 @@
                 <!-- Os dados da tabela serão preenchidos dinamicamente -->
             </tbody>
         </table>
-
+      </div>
         <div class="export-button">
             <button id="exportButton">Exportar para Excel</button>
         </div>
