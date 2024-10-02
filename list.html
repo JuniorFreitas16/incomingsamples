@@ -185,7 +185,7 @@
         <table>
             <thead>
                 <tr>
-                    
+                    <th>ID</th>
                     <th>Data Input</th>
                     <th>Inspection Lot</th>
                     <th>Número Planta</th>
@@ -244,7 +244,7 @@
             items.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    
+                    <td>${item.id}</td>
                     <td>${formatDate(item.inputData)}</td>
                     <td>${item.inspectionLot}</td>
                     <td>${item.plantNumber}</td>
