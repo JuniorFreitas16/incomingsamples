@@ -93,7 +93,41 @@
         <!-- Manual Input Form -->
         <div class="manual-input">
             <form id="itemForm">
-                <!-- (Os campos do formulário permanecem os mesmos) -->
+                <label for="inputData">Data Input:</label>
+                <input type="datetime-local" id="inputData" required>
+
+                <label for="inspectionLot">Inspection Lot:</label>
+                <input type="number" id="inspectionLot" required>
+
+                <label for="plantNumber">Número Planta:</label>
+                <input type="text" id="plantNumber" required>
+
+                <label for="location">Locação:</label>
+                <input type="text" id="location" required>
+
+                <label for="material">Material:</label>
+                <input type="text" id="material" required>
+
+                <label for="description">Descrição:</label>
+                <input type="text" id="description" required>
+
+                <label for="quantity">Quantidade Lote:</label>
+                <input type="number" id="quantity" required>
+
+                <label for="samplePlan">Plano de Amostra:</label>
+                <input type="text" id="samplePlan" readonly>
+
+                <label for="status">Status Atual:</label>
+                <select id="status" required>
+                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+
+                <label for="iqcCollaborator">Colaborador IQC:</label>
+                <input type="text" id="iqcCollaborator" required>
+
+                <button type="submit">Cadastrar</button>
             </form>
             <div id="feedback" style="color: red;"></div>
         </div>
