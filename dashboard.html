@@ -17,6 +17,11 @@
                 width: 100%;
                 padding: 10px;
             }
+            #filters div{
+                width: 90%;
+                flex-wrap: wrap;
+                flex-direction: column;
+            }
         }
 
         body {
@@ -92,10 +97,12 @@
         table {
             display: block;
             width: 100%;
+            height: 300px;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 0px;
             flex-wrap: wrap;
-            overflow-x: auto; /* Permite rolagem horizontal */
+            overflow-x: auto;
+            overflow-y: auto;
         }
 
         table, th, td {
@@ -114,6 +121,19 @@
             color: white;
         }
 
+       .table2{
+            display: block;
+            width: 100%;
+            height: 80px;
+            border-collapse: collapse;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            overflow-x: auto;
+            text-align: center;
+            border: 1px solid #ddd;
+            justify-content: center;
+        } 
+
         .status-in-progress {
             color: blue;
         }
@@ -125,13 +145,30 @@
         .status-finalized {
             color: green;
         }
-        
+
         .graphics {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
 
+        #filters input {
+            width: 120px;
+            margin-left: 10px;
+        }
+
+        #filters div {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .filters-container{
+            width: 100%;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +213,7 @@
         </div>
         
         <div class="table-container">
-            <table>
+              <table class='table2'>
                 <thead>
                     <tr>
                         <th>Data Input</th>
@@ -192,99 +229,206 @@
                         <th>Hora de Conclusão</th>
                     </tr>
                 </thead>
+             </table>
+           <table>
+
                 <tbody id="dashboardTableBody">
                     <!-- Os dados da tabela serão preenchidos dinamicamente -->
                 </tbody>
             </table>
         </div>
+                <!-- Filtros de busca -->
+        <div class="filters-container">
+                <div id="filters">
+                    <div>
+                        <label for="filterDate">Data de Input:</label>
+                        <input type="date" id="filterDate">
+
+                        <label for="filterInspectionLot">Inspection Lot:</label>
+                        <input type="number" id="filterInspectionLot">
+
+                        <label for="filterPlant">Número Planta:</label>
+                        <input type="text" id="filterPlant">
+
+                        <label for="filterLocation">Locação:</label>
+                        <input type="text" id="filterLocation">
+                    </div>
+
+                    <div>
+                        <label for="filterMaterial">Material:</label>
+                        <input type="text" id="filterMaterial">
+
+                        <label for="filterStatus">Status:</label>
+                        <select id="filterStatus">
+                            <option value="">Todos</option>
+                            <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
+                            <option value="Pendente de Inspeção">Pendente de Inspeção</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+
+                        <label for="filterCollaborator">Colaborador IQC:</label>
+                        <input type="text" id="filterCollaborator">
+
+                        <button onclick="applyFilters()">Aplicar Filtros</button>
+                        <button onclick="clearFilters()">Limpar Filtros</button>
+                    </div>
+                </div>
+        </div>        
     </div>
 
     <script>
-    function formatDate(dateTimeString) {
-        const date = new Date(dateTimeString);
-        return date.toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
-    }
+        let allSamples = []; // Armazena todas as amostras carregadas da API
 
-    // Função para carregar os samples e atualizar a página
-    function loadSamples() {
-        return fetch('http://52.67.36.220/samples')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar os dados do servidor');
-                }
-                return response.json();
-            })
-            .then(samples => {
-                updateDashboard(samples);
-                renderCharts(samples);
-            })
-            .catch(error => {
-                console.error('Erro ao carregar dados:', error);
-                alert('Erro ao carregar dados do servidor.');
+        function formatDate(dateTimeString) {
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+        }
+
+        // Carregar as amostras da API
+        function loadSamples() {
+            return fetch('https://52.67.36.220/samples')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar os dados do servidor');
+                    }
+                    return response.json();
+                })
+                .then(samples => {
+                    allSamples = samples; // Armazenar todos os dados carregados
+                    updateDashboard(samples); // Atualizar contadores e gráficos
+                    renderSamples(samples); // Exibir os itens na tabela
+                    renderCharts(samples); // Exibir gráficos
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados:', error);
+                    alert('Erro ao carregar dados do servidor.');
+                });
+        }
+
+        // Função para renderizar amostras na tabela
+        function renderSamples(samples) {
+            const dashboardTableBody = document.getElementById('dashboardTableBody');
+            dashboardTableBody.innerHTML = ''; // Limpar a tabela antes de renderizar
+
+            samples.forEach(sample => {
+                const row = dashboardTableBody.insertRow();
+                row.insertCell(0).textContent = new Date(sample.inputData).toISOString().slice(0, 16);
+                row.insertCell(1).textContent = sample.inspectionLot;
+                row.insertCell(2).textContent = sample.plantNumber;
+                row.insertCell(3).textContent = sample.location;
+                row.insertCell(4).textContent = sample.material;
+                row.insertCell(5).textContent = sample.description;
+                row.insertCell(6).textContent = sample.quantity;
+                row.insertCell(7).textContent = sample.samplePlan;
+
+                // Atribuir uma classe de cor ao status
+                const statusCell = row.insertCell(8);
+                statusCell.textContent = sample.status;
+                statusCell.classList.add(sample.status === 'Em Processo de Inspeção' ? 'status-in-progress' :
+                    sample.status === 'Pendente de Inspeção' ? 'status-pending' : 'status-finalized');
+
+                row.insertCell(9).textContent = sample.iqcCollaborator;
+                row.insertCell(10).textContent = sample.finishTime ? formatDate(sample.finishTime) : '---';
             });
-    }
+        }
 
-    // Função para atualizar a tabela e os contadores do dashboard
-    function updateDashboard(samples) {
-        let totalSamples = 0;
-        let inProgressSamples = 0;
-        let pendingItems = 0;
-        let completedSamples = 0;
-        let samplePlanInProgress = 0;
-        let samplePlanCompleted = 0;
-        
-        const dashboardTableBody = document.getElementById('dashboardTableBody');
-        dashboardTableBody.innerHTML = '';
+        // Função para atualizar os contadores no dashboard
+        function updateDashboard(samples) {
+            let totalSamples = samples.length;
+            let inProgressSamples = samples.filter(sample => sample.status === 'Em Processo de Inspeção').length;
+            let pendingItems = samples.filter(sample => sample.status === 'Pendente de Inspeção').length;
+            let completedSamples = samples.filter(sample => sample.status === 'Finalizado').length;
 
-        samples.forEach(sample => {
-            totalSamples += 1;
+            document.getElementById('totalSamples').textContent = totalSamples;
+            document.getElementById('inProgressSamples').textContent = inProgressSamples;
+            document.getElementById('pendingItems').textContent = pendingItems;
+            document.getElementById('completedSamples').textContent = completedSamples;
 
-            if (sample.status === 'Em Processo de Inspeção') {
-                inProgressSamples += 1;
-                samplePlanInProgress += parseInt(sample.samplePlan) || 0;
-            } else if (sample.status === 'Pendente de Inspeção') {
-                pendingItems += 1;
-            } else if (sample.status === 'Finalizado') {
-                completedSamples += 1;
-                samplePlanCompleted += parseInt(sample.samplePlan) || 0;
-            }
+            // Atualizar contadores de amostras baseados no plano de amostra
+            let samplePlanInProgress = samples
+                .filter(sample => sample.status === 'Em Processo de Inspeção')
+                .reduce((acc, sample) => acc + (parseInt(sample.samplePlan) || 0), 0);
 
-            const row = dashboardTableBody.insertRow();
-            row.insertCell(0).textContent = formatDate(sample.inputData);
-            row.insertCell(1).textContent = sample.inspectionLot;
-            row.insertCell(2).textContent = sample.plantNumber;
-            row.insertCell(3).textContent = sample.location;
-            row.insertCell(4).textContent = sample.material;
-            row.insertCell(5).textContent = sample.description;
-            row.insertCell(6).textContent = sample.quantity;
-            row.insertCell(7).textContent = sample.samplePlan;
+            let samplePlanCompleted = samples
+                .filter(sample => sample.status === 'Finalizado')
+                .reduce((acc, sample) => acc + (parseInt(sample.samplePlan) || 0), 0);
 
-            const statusCell = row.insertCell(8);
-            statusCell.textContent = sample.status;
-            statusCell.classList.add(sample.status === 'Em Processo de Inspeção' ? 'status-in-progress' :
-                sample.status === 'Pendente de Inspeção' ? 'status-pending' : 'status-finalized');
+            document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
+            document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
+        }
 
-            row.insertCell(9).textContent = sample.iqcCollaborator;
-            row.insertCell(10).textContent = sample.finishTime ? formatDate(sample.finishTime) : '---';
-        });
+        // Função para aplicar filtros nas amostras
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value.toLowerCase();
+            const filterInspectionLot = document.getElementById('filterInspectionLot').value.toLowerCase();
+            const filterPlant = document.getElementById('filterPlant').value.toLowerCase();
+            const filterLocation = document.getElementById('filterLocation').value.toLowerCase();
+            const filterMaterial = document.getElementById('filterMaterial').value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
+            const filterCollaborator = document.getElementById('filterCollaborator').value.toLowerCase();
 
-        document.getElementById('totalSamples').textContent = totalSamples;
-        document.getElementById('inProgressSamples').textContent = inProgressSamples;
-        document.getElementById('pendingItems').textContent = pendingItems;
-        document.getElementById('completedSamples').textContent = completedSamples;
-        document.getElementById('samplePlanInProgress').textContent =document.getElementById('samplePlanInProgress').textContent = samplePlanInProgress;
-        document.getElementById('samplePlanCompleted').textContent = samplePlanCompleted;
-    }
+            const filteredSamples = allSamples.filter(sample => {
+                const dateMatch = !filterDate || sample.inputData.toLowerCase().includes(filterDate);
+                const inspectionLotMatch = !filterInspectionLot || sample.inspectionLot.toLowerCase().includes(filterInspectionLot);
+                const plantMatch = !filterPlant || sample.plantNumber.toLowerCase().includes(filterPlant);
+                const locationMatch = !filterLocation || sample.location.toLowerCase().includes(filterLocation);
+                const materialMatch = !filterMaterial || sample.material.toLowerCase().includes(filterMaterial);
+                const statusMatch = !filterStatus || sample.status.toLowerCase().includes(filterStatus);
+                const collaboratorMatch = !filterCollaborator || sample.iqcCollaborator.toLowerCase().includes(filterCollaborator);
 
-    // Função para renderizar os gráficos
-    function renderCharts(samples) {
+                return dateMatch && inspectionLotMatch && plantMatch && locationMatch && materialMatch && statusMatch && collaboratorMatch;
+            });
+
+            renderSamples(filteredSamples); // Renderizar as amostras filtradas
+            updateDashboard(filteredSamples); // Atualizar os contadores com os dados filtrados
+        }
+
+        // Função para limpar filtros e mostrar todas as amostras
+        function clearFilters() {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterInspectionLot').value = '';
+            document.getElementById('filterPlant').value = '';
+            document.getElementById('filterLocation').value = '';
+            document.getElementById('filterMaterial').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterCollaborator').value = '';
+
+            renderSamples(allSamples); // Exibir todas as amostras
+            updateDashboard(allSamples); // Atualizar os contadores com todas as amostras
+        }
+
+// Função para renderizar os gráficos
+function renderCharts(samples) {
+        // Gráfico de status das inspeções
         const statusCounts = samples.reduce((counts, sample) => {
             counts[sample.status] = (counts[sample.status] || 0) + 1;
             return counts;
         }, {});
 
         const chart = JSC.chart('chartDiv', {
-            title_label_text: 'Inspeções por Status',
+            title_label_text: 'Inspeções',
+            box: {
+            padding: 10,
+            radius: 5,
+            fill: '#e5f6ff'},
+            palette: ['#4169E1', '#0040FF', '#86878A'],
+            title: {
+            label_text: 'Inspeções',
+            position: 'center',
+            },
+            legend_visible: true, 
+            legend_position: 'bottom', 
+            defaultSeries: {
+            type: 'pie',
+            angle_orientation: 125,
+            shape_padding: 2,
+            mouseTracking_enabled: true
+            },
+            defaultPoint: {
+            label: {
+            text: '%yValue',
+            margin: 10
+            }},
             series: [
                 {
                     points: Object.keys(statusCounts).map(status => ({
@@ -295,38 +439,55 @@
             ]
         });
 
+        // Gráfico de amostras por status
         const planCounts = samples.reduce((counts, sample) => {
             if (sample.status === 'Finalizado') {
-                counts.completed = (counts.completed || 0) + parseInt(sample.samplePlan) || 0;
+                counts.completed += parseInt(sample.samplePlan) || 0;
             } else if (sample.status === 'Em Processo de Inspeção') {
-                counts.inProgress = (counts.inProgress || 0) + parseInt(sample.samplePlan) || 0;
+                counts.inProgress += parseInt(sample.samplePlan) || 0;
             }
             return counts;
-        }, {});
+        }, { completed: 0, inProgress: 0 });
 
         const chart2 = JSC.chart('chartDiv2', {
-            title_label_text: 'Amostras por Status',
+            title_label_text: 'Amostras',
+            box: {
+            radius: 5,
+            fill: '#e5f6ff'},
+            title: {
+            label_text: 'Amostras',
+            position: 'center',
+            }, 
+            type: 'column', 
+            label_text: 'Amostras',
+            position: 'center', 
+            legend_visible: false, 
+            defaultPoint:{
+            label: {
+            text: '{%yValue:n1}%',
+            margin: 10
+            }}, 
             series: [
                 {
                     points: [
-                        { x: 'Amostras Finalizadas', y: planCounts.completed || 0 },
-                        { x: 'Amostras em Inspeção', y: planCounts.inProgress || 0 }
+                        { x: 'Amostras em Inspeção', y: (planCounts.inProgress/(planCounts.completed+planCounts.inProgress))*100},                        
+                        { x: 'Amostras Finalizadas', y: (planCounts.completed/(planCounts.completed+planCounts.inProgress))*100}
+
                     ]
                 }
             ]
         });
-    }
+   } 
+        
 
-    // Carregar os dados ao abrir a página
-    document.addEventListener('DOMContentLoaded', () => {
-        loadSamples(); // Carregar dados inicialmente
-
-        // Atualizar a cada 30 segundos (30000 ms)
-        setInterval(loadSamples, 30000);
-    });
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamples(); // Carregar as amostras ao abrir a página
+      
+            setInterval(loadSamples, 30000);
+  });
     </script>
 
-    <!-- Biblioteca para gráficos -->
+    <!-- Incluindo a biblioteca de gráficos -->
     <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
 </body>
 </html>
