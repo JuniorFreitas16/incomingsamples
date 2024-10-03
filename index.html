@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">    
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Itens - Incoming Inspection VD</title>
+    <title>Cadastro de Itens com Leitura de Código de Barras</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -72,25 +72,10 @@
             margin-top: 20px;
             text-align: center;
         }
-
-        #video {
-            width: 100%;
-            height: auto;
-            display: none;
-        }
-
-        #scanResult {
-            font-size: 16px;
-            color: green;
-        }
-
-        .manual-input {
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
-    <h1>Incoming Inspection VD - Cadastro de Itens</h1>
+    <h1>Cadastro de Itens com Leitura de QR Code ou Código de Barras</h1>
     <div class="container">
         <div class="navigation">
             <a href="dashboard.html">Dashboard</a>
@@ -100,9 +85,7 @@
         <!-- QR Code / Bar Code Scanner -->
         <div class="scanner-container">
             <h2>Leitura de QR Code ou Código de Barras</h2>
-            <button id="startScan">Iniciar Leitura</button>
-            <video id="video"></video>
-            <p id="scanResult"></p>
+            <button id="scanButton">Iniciar Leitura</button>
         </div>
 
         <!-- Manual Input Form -->
@@ -148,56 +131,23 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.0/jsQR.min.js"></script>
-
     <script>
-        const video = document.getElementById('video');
-        const startScanButton = document.getElementById('startScan');
-        const scanResult = document.getElementById('scanResult');
-        const feedback = document.getElementById('feedback');
+        // URL para abrir o ZXing Barcode Scanner com o esquema URL
+        const scanButton = document.getElementById('scanButton');
 
-        // Função para iniciar a leitura de QR Code ou Código de Barras
-        startScanButton.addEventListener('click', function () {
-            scanResult.textContent = '';
-            feedback.textContent = '';
-
-            // Acessar a câmera do dispositivo
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(stream => {
-                video.srcObject = stream;
-                video.setAttribute('playsinline', true); // Para evitar fullscreen em alguns dispositivos
-                video.style.display = 'block';
-                video.play();
-                requestAnimationFrame(scanQRCode);
-            }).catch(err => {
-                console.error('Erro ao acessar a câmera:', err);
-                feedback.textContent = 'Erro ao acessar a câmera.';
-            });
+        scanButton.addEventListener('click', function() {
+            const retUrl = encodeURIComponent(window.location.href + '?code={CODE}');
+            const zxingUrl = `zxing://scan/?ret=${retUrl}&SCAN_FORMATS=QR_CODE,UPC_A,EAN_13`;
+            window.location.href = zxingUrl;
         });
 
-        function scanQRCode() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Captura o código da URL após o redirecionamento do ZXing
+        const urlParams = new URLSearchParams(window.location.search);
+        const scannedCode = urlParams.get('code');
 
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, canvas.width, canvas.height, {
-                    inversionAttempts: 'dontInvert',
-                });
-
-                if (code) {
-                    scanResult.textContent = `Código detectado: ${code.data}`;
-                    video.style.display = 'none';
-                    video.srcObject.getTracks().forEach(track => track.stop()); // Parar a câmera
-
-                    // Você pode preencher automaticamente alguns campos com base no código
-                    // Exemplo: document.getElementById('inspectionLot').value = code.data;
-                } else {
-                    requestAnimationFrame(scanQRCode);
-                }
-            }
+        if (scannedCode) {
+            document.getElementById('inspectionLot').value = scannedCode; // Preenche o campo Inspection Lot
+            document.getElementById('feedback').textContent = `Código escaneado: ${scannedCode}`;
         }
 
         // Submeter o formulário de dados
@@ -209,3 +159,34 @@
                 plantNumber: document.getElementById('plantNumber').value,
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
+                description: document.getElementById('description').value,
+                quantity: document.getElementById('quantity').value,
+                samplePlan: document.getElementById('samplePlan').value,
+                status: document.getElementById('status').value,
+                iqcCollaborator: document.getElementById('iqcCollaborator').value,
+                finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
+            };
+
+            // Enviar os dados para a API
+            fetch('https://52.67.36.220/samples', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao salvar no MySQL');
+                return response.text();
+            })
+            .then(data => {
+                alert('Item cadastrado com sucesso!');
+                document.getElementById('feedback').textContent = ''; // Limpar mensagens de erro
+                document.getElementById('itemForm').reset(); // Resetar o formulário após o sucesso
+            })
+            .catch(error => {
+                document.getElementById('feedback').textContent = error.message; // Mostrar o erro ao usuário
+                console.error('Erro:', error);
+            });
+        });
+    </script>
+</body>
+</html>
