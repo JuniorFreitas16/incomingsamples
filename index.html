@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Itens com QR Code e DataMatrix - Incoming Inspection</title>
+    <title>Cadastro de Itens via DataMatrix Zebra - Incoming Inspection</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,16 +66,16 @@
     </style>
 </head>
 <body>
-    <h1>Cadastro de Itens via QR Code e DataMatrix</h1>
+    <h1>Cadastro de Itens via DataMatrix Zebra</h1>
     <div class="container">
         <div class="scanner-container">
-            <h2>Leitura de QR Code e DataMatrix</h2>
+            <h2>Leitura de DataMatrix</h2>
             <button id="startScan">Iniciar Leitura</button>
             <video id="video" playsinline></video>
             <p id="feedback"></p>
         </div>
 
-        <!-- Formulário para preenchimento manual ou via QR Code -->
+        <!-- Formulário para preenchimento manual ou via DataMatrix -->
         <form id="itemForm">
             <label for="inputData">Data Input:</label>
             <input type="datetime-local" id="inputData" required>
@@ -110,9 +110,9 @@
         const startScanButton = document.getElementById('startScan');
         const feedback = document.getElementById('feedback');
 
-        const codeReader = new ZXing.BrowserMultiFormatReader(); // Suporte a múltiplos formatos
+        const codeReader = new ZXing.BrowserMultiFormatReader(); // Suporte a múltiplos formatos, incluindo DataMatrix
 
-        // Função para iniciar a leitura de QR Code e DataMatrix usando a câmera
+        // Função para iniciar a leitura de DataMatrix usando a câmera
         startScanButton.addEventListener('click', function() {
             feedback.textContent = ''; // Limpar feedback anterior
 
@@ -123,9 +123,16 @@
                     video.play();
                     codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
                         if (result) {
-                            const formData = JSON.parse(result.text); // Converter o resultado em JSON
-                            preencherFormulario(formData); // Preencher o formulário
-                            video.srcObject.getTracks().forEach(track => track.stop()); // Parar a câmera após a leitura
+                            const decodedData = result.text; // Dados decodificados do DataMatrix
+                            try {
+                                // Tentar converter o resultado para JSON, caso os dados estejam nesse formato
+                                const formData = JSON.parse(decodedData);
+                                preencherFormulario(formData);
+                            } catch (e) {
+                                // Se não for JSON, apenas exibir os dados brutos no formulário
+                                feedback.textContent = `Código lido: ${decodedData}`;
+                                video.srcObject.getTracks().forEach(track => track.stop()); // Parar a câmera
+                            }
                         }
                         if (err && !(err instanceof ZXing.NotFoundException)) {
                             console.error(err);
@@ -138,7 +145,7 @@
                 });
         });
 
-        // Função para preencher o formulário com os dados do QR Code ou DataMatrix
+        // Função para preencher o formulário com os dados do DataMatrix
         function preencherFormulario(data) {
             document.getElementById('inspectionLot').value = data.inspectionLot || '';
             document.getElementById('plantNumber').value = data.plantNumber || '';
