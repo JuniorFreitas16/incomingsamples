@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Itens com Leitura de Código de Barras</title>
+    <title>Cadastro de Itens com QR Code - Incoming Inspection</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,143 +50,115 @@
             background-color: #002d80;
         }
 
-        .navigation {
-            padding: 20px;
-            background-color: #0033a0;
-            color: white;
-            text-align: left;
-        }
-
-        .navigation a {
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 10px;
-        }
-
-        .navigation a:hover {
-            text-decoration: underline;
-        }
-
         .scanner-container {
             margin-top: 20px;
             text-align: center;
         }
+
+        #video {
+            width: 100%;
+            height: auto;
+        }
+
+        #feedback {
+            color: red;
+        }
     </style>
 </head>
 <body>
-    <h1>Cadastro de Itens com Leitura de QR Code ou Código de Barras</h1>
+    <h1>Cadastro de Itens via QR Code</h1>
     <div class="container">
-        <div class="navigation">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="list.html">Lista de Itens</a>
-        </div>
-
-        <!-- QR Code / Bar Code Scanner -->
         <div class="scanner-container">
-            <h2>Leitura de QR Code ou Código de Barras</h2>
-            <button id="scanButton">Iniciar Leitura</button>
+            <h2>Leitura de QR Code</h2>
+            <button id="startScan">Iniciar Leitura</button>
+            <video id="video" playsinline></video>
+            <p id="feedback"></p>
         </div>
 
-        <!-- Manual Input Form -->
-        <div class="manual-input">
-            <form id="itemForm">
-                <label for="inputData">Data Input:</label>
-                <input type="datetime-local" id="inputData" required>
+        <!-- Formulário para preenchimento manual ou via QR Code -->
+        <form id="itemForm">
+            <label for="inputData">Data Input:</label>
+            <input type="datetime-local" id="inputData" required>
 
-                <label for="inspectionLot">Inspection Lot:</label>
-                <input type="number" id="inspectionLot" required>
+            <label for="inspectionLot">Inspection Lot:</label>
+            <input type="number" id="inspectionLot" required>
 
-                <label for="plantNumber">Número Planta:</label>
-                <input type="text" id="plantNumber" required>
+            <label for="plantNumber">Número Planta:</label>
+            <input type="text" id="plantNumber" required>
 
-                <label for="location">Locação:</label>
-                <input type="text" id="location" required>
+            <label for="location">Locação:</label>
+            <input type="text" id="location" required>
 
-                <label for="material">Material:</label>
-                <input type="text" id="material" required>
+            <label for="material">Material:</label>
+            <input type="text" id="material" required>
 
-                <label for="description">Descrição:</label>
-                <input type="text" id="description" required>
+            <label for="description">Descrição:</label>
+            <input type="text" id="description" required>
 
-                <label for="quantity">Quantidade Lote:</label>
-                <input type="number" id="quantity" required>
+            <label for="quantity">Quantidade Lote:</label>
+            <input type="number" id="quantity" required>
 
-                <label for="samplePlan">Plano de Amostra:</label>
-                <input type="text" id="samplePlan" readonly>
-
-                <label for="status">Status Atual:</label>
-                <select id="status" required>
-                    <option value="Em Processo de Inspeção">Em Processo de Inspeção</option>
-                    <option value="Pendente de Inspeção">Pendente de Inspeção</option>
-                    <option value="Finalizado">Finalizado</option>
-                </select>
-
-                <label for="iqcCollaborator">Colaborador IQC:</label>
-                <input type="text" id="iqcCollaborator" required>
-
-                <button type="submit">Cadastrar</button>
-            </form>
-            <div id="feedback" style="color: red;"></div>
-        </div>
+            <button type="submit">Cadastrar</button>
+        </form>
     </div>
 
-    <script>
-        // URL para abrir o ZXing Barcode Scanner com o esquema URL
-        const scanButton = document.getElementById('scanButton');
+    <!-- Biblioteca jsQR para leitura de QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.0/jsQR.min.js"></script>
 
-        scanButton.addEventListener('click', function() {
-            const retUrl = encodeURIComponent(window.location.href + '?code={CODE}');
-            const zxingUrl = `zxing://scan/?ret=${retUrl}&SCAN_FORMATS=QR_CODE,UPC_A,EAN_13`;
-            window.location.href = zxingUrl;
+    <script>
+        const video = document.getElementById('video');
+        const startScanButton = document.getElementById('startScan');
+        const feedback = document.getElementById('feedback');
+
+        // Função para iniciar a leitura de QR Code usando a câmera
+        startScanButton.addEventListener('click', function() {
+            feedback.textContent = ''; // Limpar feedback anterior
+
+            // Solicitar acesso à câmera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                    scanQRCode();
+                }).catch(err => {
+                    console.error('Erro ao acessar a câmera:', err);
+                    feedback.textContent = 'Erro ao acessar a câmera. Certifique-se de permitir o uso da câmera.';
+                });
         });
 
-        // Captura o código da URL após o redirecionamento do ZXing
-        const urlParams = new URLSearchParams(window.location.search);
-        const scannedCode = urlParams.get('code');
+        // Função para realizar a leitura do QR Code
+        function scanQRCode() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
 
-        if (scannedCode) {
-            document.getElementById('inspectionLot').value = scannedCode; // Preenche o campo Inspection Lot
-            document.getElementById('feedback').textContent = `Código escaneado: ${scannedCode}`;
+            requestAnimationFrame(function scan() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
+
+                    if (code) {
+                        const formData = JSON.parse(code.data); // Converter o QR code em JSON
+                        preencherFormulario(formData); // Preencher o formulário
+                        video.srcObject.getTracks().forEach(track => track.stop()); // Parar a câmera após a leitura
+                    } else {
+                        requestAnimationFrame(scan); // Continuar escaneando se não encontrar QR code
+                    }
+                }
+            });
         }
 
-        // Submeter o formulário de dados
-        document.getElementById('itemForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = {
-                inputData: document.getElementById('inputData').value,
-                inspectionLot: document.getElementById('inspectionLot').value,
-                plantNumber: document.getElementById('plantNumber').value,
-                location: document.getElementById('location').value,
-                material: document.getElementById('material').value,
-                description: document.getElementById('description').value,
-                quantity: document.getElementById('quantity').value,
-                samplePlan: document.getElementById('samplePlan').value,
-                status: document.getElementById('status').value,
-                iqcCollaborator: document.getElementById('iqcCollaborator').value,
-                finishTime: document.getElementById('status').value === 'Finalizado' ? new Date().toISOString().slice(0, 16) : null,
-            };
-
-            // Enviar os dados para a API
-            fetch('https://52.67.36.220/samples', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Erro ao salvar no MySQL');
-                return response.text();
-            })
-            .then(data => {
-                alert('Item cadastrado com sucesso!');
-                document.getElementById('feedback').textContent = ''; // Limpar mensagens de erro
-                document.getElementById('itemForm').reset(); // Resetar o formulário após o sucesso
-            })
-            .catch(error => {
-                document.getElementById('feedback').textContent = error.message; // Mostrar o erro ao usuário
-                console.error('Erro:', error);
-            });
-        });
+        // Função para preencher o formulário com os dados do QR Code
+        function preencherFormulario(data) {
+            document.getElementById('inspectionLot').value = data.inspectionLot || '';
+            document.getElementById('plantNumber').value = data.plantNumber || '';
+            document.getElementById('location').value = data.location || '';
+            document.getElementById('material').value = data.material || '';
+            document.getElementById('description').value = data.description || '';
+            document.getElementById('quantity').value = data.quantity || '';
+        }
     </script>
 </body>
 </html>
