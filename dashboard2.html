@@ -481,6 +481,7 @@ function renderCharts(samples) {
 
         document.addEventListener('DOMContentLoaded', () => {
             loadSamples(); // Carregar as amostras ao abrir a página
+            setInterval(loadSamples, 30000);
         });
     </script>
 
