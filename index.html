@@ -125,13 +125,12 @@
                         if (result) {
                             const decodedData = result.text; // Dados decodificados do DataMatrix
                             try {
-                                // Tentar converter o resultado para JSON, caso os dados estejam nesse formato
+                                // Tentar converter o resultado para JSON
                                 const formData = JSON.parse(decodedData);
                                 preencherFormulario(formData);
                             } catch (e) {
-                                // Se não for JSON, apenas exibir os dados brutos no formulário
-                                feedback.textContent = `Código lido: ${decodedData}`;
-                                video.srcObject.getTracks().forEach(track => track.stop()); // Parar a câmera
+                                // Se não for JSON, fazer a formatação manual
+                                processarString(decodedData);
                             }
                         }
                         if (err && !(err instanceof ZXing.NotFoundException)) {
@@ -153,6 +152,24 @@
             document.getElementById('material').value = data.material || '';
             document.getElementById('description').value = data.description || '';
             document.getElementById('quantity').value = data.quantity || '';
+        }
+
+        // Função para processar string e preencher o formulário
+        function processarString(data) {
+            // Aqui, assumimos que os dados estão separados por vírgulas ou ponto e vírgula
+            const valores = data.split(';'); // Separar por ';' ou ',' conforme o formato
+
+            if (valores.length >= 6) {
+                // Ajuste os índices dependendo da estrutura dos seus dados
+                document.getElementById('inspectionLot').value = valores[0] || '';
+                document.getElementById('plantNumber').value = valores[1] || '';
+                document.getElementById('location').value = valores[2] || '';
+                document.getElementById('material').value = valores[3] || '';
+                document.getElementById('description').value = valores[4] || '';
+                document.getElementById('quantity').value = valores[5] || '';
+            } else {
+                feedback.textContent = 'Erro ao processar o DataMatrix: formato inesperado.';
+            }
         }
     </script>
 </body>
