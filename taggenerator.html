@@ -67,38 +67,12 @@
             display: flex;
             justify-content: space-between;
         }
-        .navigation {
-        padding: 20px;
-        background-color: #0033a0;
-        color: white;
-        text-align: left;
-        }
-
-        /*.navigation {
-            text-align: left;
-            margin-bottom: 20px;
-        }*/
-
-        .navigation a {
-            /*color: #0033a0; /* Royal Blue */
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 10px;
-        }
-
-        .navigation a:hover {
-            text-decoration: underline;
-        }
 
     </style>
 </head>
 <body>
     <h1>Gerador de DataMatrix - Incoming Inspection VD</h1>
     <div class="container">
-        <div class="navigation">
-            <a href="index.html">Voltar</a>
-        </div>
         <form id="dataForm">
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
@@ -115,9 +89,6 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="quantity">Quantidade Lote:</label>
-            <input type="number" id="quantity" required>
-
             <button type="submit">Gerar DataMatrix</button>
         </form>
 
@@ -131,7 +102,6 @@
             <button id="exportPDF">Exportar para PDF</button>
             <button id="printLabel">Imprimir Etiqueta</button>
         </div>
-        <a href="index.html">Dashboard</a>
     </div>
 
     <!-- Bibliotecas necessárias -->
@@ -157,10 +127,9 @@
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
                 description: document.getElementById('description').value,
-                quantity: document.getElementById('quantity').value
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.quantity}`;
+            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description}`;
 
             try {
                 // Gerar DataMatrix usando bwip-js
@@ -185,7 +154,6 @@
                 ["Locação", document.getElementById('location').value],
                 ["Material", document.getElementById('material').value],
                 ["Descrição", document.getElementById('description').value],
-                ["Quantidade", document.getElementById('quantity').value]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(formData);
@@ -206,7 +174,6 @@
             doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
             doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
             doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
-            doc.text(`Quantidade: ${document.getElementById('quantity').value}`, 20, 80);
 
             html2canvas(qrCanvas).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
