@@ -68,11 +68,32 @@
             justify-content: space-between;
         }
 
+        .navigation {
+            padding: 20px;
+            background-color: #0033a0;
+            color: white;
+            text-align: left;
+        }
+
+        .navigation a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
     <h1>Gerador de DataMatrix - Incoming Inspection VD</h1>
     <div class="container">
+        <div class="navigation">
+            <a href="index.html">Voltar</a>
+        </div>
         <form id="dataForm">
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
