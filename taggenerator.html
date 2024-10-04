@@ -150,17 +150,21 @@
                 description: document.getElementById('description').value,
             };
 
+            // Garantir que não haja caracteres inesperados ou especiais
             const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description}`;
 
             try {
+                // Verificar e limpar os dados de possíveis caracteres inesperados
+                const sanitizedDataString = dataString.replace(/[^\x20-\x7E]/g, ''); // Remover caracteres não imprimíveis
+
                 // Gerar DataMatrix usando bwip-js
                 bwipjs.toCanvas(qrCanvas, {
-                    bcid: 'datamatrix', // Barcode type
-                    text: dataString,   // Text to encode
-                    scale: 3,           // 3x scaling factor
-                    width: 200,         // Width for better visualization
-                    height: 200,        // Height for better visualization
-                    includetext: false, // Do not include text below barcode
+                    bcid: 'datamatrix', // Tipo de código de barras
+                    text: sanitizedDataString, // Texto para codificar
+                    scale: 3, // Fator de escala 3x
+                    width: 200, // Largura
+                    height: 200, // Altura
+                    includetext: false, // Não incluir o texto abaixo
                 });
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
