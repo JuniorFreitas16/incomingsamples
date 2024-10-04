@@ -95,6 +95,7 @@
         <div class="navigation">
             <a href="dashboard.html">Dashboard</a>
             <a href="list.html">Lista de Itens</a>
+            <a href="taggenerator.html">Tag Generator</a>
         </div>
 
         <!-- QR Code / Bar Code Scanner -->
@@ -152,6 +153,11 @@
     <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <script>
+        // Configuração da data de Manaus
+        const now = new Date();
+        now.setHours(now.getUTCHours() - 8);  // Ajuste para horário de Manaus
+        document.getElementById('inputData').value = now.toISOString().slice(0, 16);
+        
         const video = document.getElementById('video');
         const startScanButton = document.getElementById('startScan');
         const scanResult = document.getElementById('scanResult');
