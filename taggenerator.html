@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de DataMatrix - Incoming Inspection VD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0033a0;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #0033a0;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #002d80;
+        }
+
+        .generated-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #datamatrix {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            width: 150px;
+            height: 150px;
+        }
+
+        .export-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Gerador de DataMatrix - Incoming Inspection VD</h1>
+    <div class="container">
+        <form id="dataForm">
+            <label for="inspectionLot">Inspection Lot:</label>
+            <input type="text" id="inspectionLot" required>
+
+            <label for="plantNumber">Número Planta:</label>
+            <input type="text" id="plantNumber" required>
+
+            <label for="location">Locação:</label>
+            <input type="text" id="location" required>
+
+            <label for="material">Material:</label>
+            <input type="text" id="material" required>
+
+            <label for="description">Descrição:</label>
+            <input type="text" id="description" required>
+
+            <label for="quantity">Quantidade Lote:</label>
+            <input type="number" id="quantity" required>
+
+            <button type="submit">Gerar DataMatrix</button>
+        </form>
+
+        <div class="generated-code">
+            <h3>DataMatrix Gerado</h3>
+            <canvas id="datamatrix"></canvas>
+        </div>
+
+        <div class="export-buttons">
+            <button id="exportExcel">Exportar para Excel</button>
+            <button id="exportPDF">Exportar para PDF</button>
+            <button id="printLabel">Imprimir Etiqueta</button>
+        </div>
+    </div>
+
+    <!-- Bibliotecas necessárias -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@2.0.9/dist/bwip-js.min.js"></script>
+
+    <script>
+        const form = document.getElementById('dataForm');
+        const qrCanvas = document.getElementById('datamatrix');
+        const exportExcelButton = document.getElementById('exportExcel');
+        const exportPDFButton = document.getElementById('exportPDF');
+        const printLabelButton = document.getElementById('printLabel');
+
+        // Função para gerar DataMatrix usando bwip-js
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                inspectionLot: document.getElementById('inspectionLot').value,
+                plantNumber: document.getElementById('plantNumber').value,
+                location: document.getElementById('location').value,
+                material: document.getElementById('material').value,
+                description: document.getElementById('description').value,
+                quantity: document.getElementById('quantity').value
+            };
+
+            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.quantity}`;
+
+            try {
+                // Gerar DataMatrix usando bwip-js
+                bwipjs.toCanvas(qrCanvas, {
+                    bcid: 'datamatrix', // Barcode type
+                    text: dataString,   // Text to encode
+                    scale: 3,           // 3x scaling factor
+                    width: 200,         // Width for better visualization
+                    height: 200,        // Height for better visualization
+                    includetext: false, // Do not include text below barcode
+                });
+            } catch (e) {
+                console.error('Erro ao gerar DataMatrix:', e);
+            }
+        });
+
+        // Função para exportar para Excel
+        exportExcelButton.addEventListener('click', function() {
+            const formData = [
+                ["Inspection Lot", document.getElementById('inspectionLot').value],
+                ["Número Planta", document.getElementById('plantNumber').value],
+                ["Locação", document.getElementById('location').value],
+                ["Material", document.getElementById('material').value],
+                ["Descrição", document.getElementById('description').value],
+                ["Quantidade", document.getElementById('quantity').value]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(formData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+
+            XLSX.writeFile(wb, 'datamatrix_data.xlsx');
+        });
+
+        // Função para exportar para PDF
+        exportPDFButton.addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text('DataMatrix Gerado', 20, 20);
+            doc.text(`Inspection Lot: ${document.getElementById('inspectionLot').value}`, 20, 30);
+            doc.text(`Número Planta: ${document.getElementById('plantNumber').value}`, 20, 40);
+            doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
+            doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
+            doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
+            doc.text(`Quantidade: ${document.getElementById('quantity').value}`, 20, 80);
+
+            html2canvas(qrCanvas).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 20, 90, 50, 50);
+                doc.save('datamatrix_data.pdf');
+            });
+        });
+
+        // Função para imprimir a etiqueta
+        printLabelButton.addEventListener('click', function() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
+            printWindow.document.write('<h1>Etiqueta Gerada</h1>');
+            printWindow.document.write('<canvas id="printCanvas"></canvas>');
+            printWindow.document.write('</body></html>');
+
+            printWindow.document.close();
+            printWindow.focus();
+
+            const printCanvas = printWindow.document.getElementById('printCanvas');
+            const context = printCanvas.getContext('2d');
+
+            html2canvas(qrCanvas).then(canvas => {
+                context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+                printWindow.print();
+            });
+        });
+    </script>
+</body>
+</html>
