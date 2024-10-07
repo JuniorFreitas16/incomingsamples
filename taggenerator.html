@@ -115,14 +115,14 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="quantity">Quantidade Lote:</label>
-            <input type="number" id="quantity">
+            <!--<label for="quantity">Quantidade Lote:</label>-->
+            <input type="hidden" id="quantity">
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
 
         <div class="generated-code">
-            <h3>DataMatrix Gerado</h3>
+            <!--<h3>DataMatrix Gerado</h3>-->
             <canvas id="datamatrix"></canvas>
         </div>
 
@@ -217,8 +217,8 @@
         // Função para imprimir a etiqueta
         printLabelButton.addEventListener('click', function() {
             const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-            printWindow.document.write('<h1>Etiqueta Gerada</h1>');
+            printWindow.document.write('<html><head><title>Etiqueta Gerada</title></head><body>');
+            printWindow.document.write('<h1>{document.getElementById('inspectionLot').value}</h1>');
             printWindow.document.write('<canvas id="printCanvas"></canvas>');
             printWindow.document.write('</body></html>');
 
