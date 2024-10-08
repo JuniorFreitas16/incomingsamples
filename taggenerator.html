@@ -227,6 +227,7 @@
                 plantNumber: document.getElementById('plantNumber').value,
                 material: document.getElementById('material').value,
                 location: document.getElementById('location').value,
+                quantity: document.getElementById('quantity').value
             };
             
             const printWindow = window.open('', '_blank');
@@ -241,6 +242,7 @@
             printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
             printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
             printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br><br>`);
+            printWindow.document.write(`<strong>Quantidade:</strong> ${formData.quantity}<br><br>`);
             printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</body></html>');
