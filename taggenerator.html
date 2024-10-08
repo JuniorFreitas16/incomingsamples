@@ -100,6 +100,9 @@
             <a href="index.html">Voltar</a>
         </div>
         <form id="dataForm">
+            <label for="container">Container:</label>
+            <input type="text" id="container" required>
+
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
 
@@ -115,8 +118,8 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <!--<label for="quantity">Quantidade Lote:</label>-->
-            <input type="hidden" id="quantity">
+            <label for="quantity">Quantidade Lote:</label>
+            <input type="number" id="quantity">
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -151,6 +154,7 @@
             event.preventDefault();
 
             const formData = {
+                container: document.getElementById('container').value,
                 inspectionLot: document.getElementById('inspectionLot').value,
                 plantNumber: document.getElementById('plantNumber').value,
                 location: document.getElementById('location').value,
@@ -159,7 +163,7 @@
                 quantity: document.getElementById('quantity').value
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.quantity}`;
+            const dataString = `${formData.container}*${formData.inspectionLot}*${formData.plantNumber}*${formData.location}*${formData.material}*${formData.description}*${formData.quantity}*`;
 
             try {
                 // Gerar DataMatrix usando bwip-js
@@ -218,6 +222,7 @@
         printLabelButton.addEventListener('click', function() {
            
             const formData = {
+                container: document.getElementById('container').value,
                 inspectionLot: document.getElementById('inspectionLot').value,
                 plantNumber: document.getElementById('plantNumber').value,
                 material: document.getElementById('material').value,
@@ -226,12 +231,17 @@
             
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
-            printWindow.document.write('<div style="font-size: 14px; text-align: left; margin-top: 20px;">');
+            printWindow.document.write('<div style="display: inline-flex;font-size: 14px; text-align: left; margin-top: 20px;">');
+            printWindow.document.write('<div style="float: left;">');
             printWindow.document.write('<canvas id="printCanvas"></canvas><br><br>');
+            printWindow.document.write('</div>');
+            printWindow.document.write('<div style="float: right">');
+            printWindow.document.write(`<strong>Container:</strong> ${formData.container}<br>`);    
             printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
             printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
             printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
             printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br><br>`);
+            printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</body></html>');
 
