@@ -215,7 +215,7 @@
 
         // Função para processar strings delimitadas (DataMatrix sem formatação JSON)
         function processarString(data) {
-            const valores = data.split(';'); // Ajustar separador conforme formato
+            const valores = data.split('*'); // Ajustar separador conforme formato
             if (valores.length >= 6) {
                 document.getElementById('inspectionLot').value = valores[0] || '';
                 document.getElementById('plantNumber').value = valores[1] || '';
