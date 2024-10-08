@@ -163,7 +163,7 @@
                 quantity: document.getElementById('quantity').value
             };
 
-            const dataString = `${formData.inspectionLot}*${formData.plantNumber}*${formData.location}*${formData.material}*${formData.description}*${formData.quantity} `;
+            const dataString = `${formData.inspectionLot}*${formData.plantNumber}*${formData.location}*${formData.material}*${formData.description}*${formData.quantity}*`;
 
             try {
                 // Gerar DataMatrix usando bwip-js
@@ -233,16 +233,13 @@
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
             printWindow.document.write('<div style="display: inline-flex;font-size: 14px; text-align: left; margin-top: 20px;">');
-            printWindow.document.write('<div style="float: left;">');
             printWindow.document.write('<canvas id="printCanvas"></canvas>');
-            printWindow.document.write('<div style="float: right">');
             printWindow.document.write(`<strong>Container:</strong> ${formData.container}<br>`);    
             printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
             printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
             printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
             printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br>`);
             printWindow.document.write(`<strong>Quantidade:</strong> ${formData.quantity}<br>`);
-            printWindow.document.write('</div>');
             printWindow.document.write('</div>');
             printWindow.document.write('</body></html>');
 
