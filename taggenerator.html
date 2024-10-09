@@ -453,9 +453,10 @@
             const printWindow = window.open('', '_blank');
 
             printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
-printWindow.document.write('<canvas id="printCanvas" width=200 height=200 style="width:100px;height:100px"></canvas><br><br>'); 
 
             printWindow.document.write('<div style="font-size: 14px; text-align: left; margin-top: 20px;">');
+
+            printWindow.document.write('<canvas id="printCanvas"></canvas><br><br>');
 
             printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
 
@@ -479,7 +480,7 @@ printWindow.document.write('<canvas id="printCanvas" width=200 height=200 style=
 
             const printCanvas = printWindow.document.getElementById('printCanvas');
 
-            const context = printCanvas.getContext('2d', {willReadFrequently: true});
+            const context = printCanvas.getContext('2d');
 
 
 
