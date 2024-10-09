@@ -479,7 +479,7 @@ printWindow.document.write('<canvas id="printCanvas"></canvas><br><br>');
 
             const printCanvas = printWindow.document.getElementById('printCanvas');
 
-            const context = printCanvas.getContext('2d');
+            const context = printCanvas.getContext('2d', {willReadFrequently: true});
 
 
 
