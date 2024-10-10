@@ -215,7 +215,7 @@
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
             printWindow.document.write('<div class="label-layout" style="display: flex; align-items: center;">');
-            printWindow.document.write('<div style="flex: 1; background-color: green;"><canvas id="printCanvas"></canvas></div>');
+            printWindow.document.write('<div style="flex: 1;"><canvas id="printCanvas"></canvas></div>');
             printWindow.document.write('<div class="print-data" style="flex: 2; text-align: left;">');
             printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
             printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
@@ -233,7 +233,6 @@
 
             // Renderizar o DataMatrix para o printCanvas
             html2canvas(qrCanvas).then(canvas => {
-                // Desenhar o DataMatrix no canvas de impressão
                 printCanvas.width = canvas.width;
                 printCanvas.height = canvas.height;
                 context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
@@ -244,4 +243,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
