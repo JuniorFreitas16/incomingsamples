@@ -60,6 +60,7 @@
 
         .data-info {
             margin-left: 20px;
+            text-align: justify;
         }
 
         .export-buttons {
@@ -126,6 +127,9 @@
             <a href="index.html">Voltar</a>
         </div>
         <form id="dataForm">
+            <label for="container">Container:</label>
+            <input type="text" id="container" required>
+
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
 
@@ -141,8 +145,9 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="container">Container:</label>
-            <input type="text" id="container" required>
+            <label for="description">Quantidade:</label>
+            <input type="number" id="quantity" required>
+
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -150,11 +155,13 @@
         <div class="generated-code" id="generatedCode">
             <canvas id="datamatrix" width="200" height="200" style="width: 200px;"></canvas>
             <div class="data-info">
+               
+                <p><strong>Container:</strong> <span id="infoContainer"></span></p> 
                 <p><strong>Material:</strong> <span id="infoMaterial"></span></p>
                 <p><strong>Inspection Lot:</strong> <span id="infoInspectionLot"></span></p>
                 <p><strong>Número Planta:</strong> <span id="infoPlantNumber"></span></p>
                 <p><strong>Locação:</strong> <span id="infoLocation"></span></p>
-                <p><strong>Container:</strong> <span id="infoContainer"></span></p>
+                <p><strong>Quantidade:</strong> <span id="infoContainer"></span></p>
             </div>
         </div>
 
@@ -183,15 +190,19 @@
             event.preventDefault();
 
             const formData = {
+                container: document.getElementById('container').value, 
                 inspectionLot: document.getElementById('inspectionLot').value,
                 plantNumber: document.getElementById('plantNumber').value,
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
-                description: document.getElementById('description').value,
-                container: document.getElementById('container').value
+                description: document.getElementById('description').value, 
+
+                quantity:
+document.getElementById('quantity').value
+                
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.container}`;
+            const dataString = `${formData.inspectionLot}*${formData.plantNumber}*${formData.location}*${formData.material}*${formData.description}*${formData.quantity}*`;
 
             try {
                 // Gerar DataMatrix usando bwip-js e garantir que seja 200x200 pixels
@@ -205,11 +216,14 @@
                 });
 
                 // Preencher as informações na div ao lado do DataMatrix
-                document.getElementById('infoMaterial').textContent = formData.material;
+                
+document.getElementById('infoContainer').textContent = formData.container;
+
+document.getElementById('infoMaterial').textContent = formData.material;
                 document.getElementById('infoInspectionLot').textContent = formData.inspectionLot;
                 document.getElementById('infoPlantNumber').textContent = formData.plantNumber;
                 document.getElementById('infoLocation').textContent = formData.location;
-                document.getElementById('infoContainer').textContent = formData.container;
+                
 
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
