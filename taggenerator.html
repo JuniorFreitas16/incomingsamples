@@ -53,13 +53,13 @@
         .generated-code {
             text-align: center;
             margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        .data-info {
-            margin-left: 20px;
+        #datamatrix {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            width: 150px;
+            height: 150px;
         }
 
         .export-buttons {
@@ -147,15 +147,9 @@
             <button type="submit">Gerar DataMatrix</button>
         </form>
 
-        <div class="generated-code" id="generatedCode">
+        <div class="generated-code">
+            <h3>DataMatrix Gerado</h3>
             <canvas id="datamatrix"></canvas>
-            <div class="data-info">
-                <p><strong>Material:</strong> <span id="infoMaterial"></span></p>
-                <p><strong>Inspection Lot:</strong> <span id="infoInspectionLot"></span></p>
-                <p><strong>Número Planta:</strong> <span id="infoPlantNumber"></span></p>
-                <p><strong>Locação:</strong> <span id="infoLocation"></span></p>
-                <p><strong>Container:</strong> <span id="infoContainer"></span></p>
-            </div>
         </div>
 
         <div class="export-buttons">
@@ -203,30 +197,47 @@
                     height: 150,        // Ajustar altura
                     includetext: false, // Não incluir texto abaixo do código
                 });
-
-                // Preencher as informações na div
-                document.getElementById('infoMaterial').textContent = formData.material;
-                document.getElementById('infoInspectionLot').textContent = formData.inspectionLot;
-                document.getElementById('infoPlantNumber').textContent = formData.plantNumber;
-                document.getElementById('infoLocation').textContent = formData.location;
-                document.getElementById('infoContainer').textContent = formData.container;
-
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
             }
         });
 
-        // Função para imprimir a etiqueta como uma imagem em 400x150 pixels
+        // Função para imprimir a etiqueta com DataMatrix à esquerda e dados à direita
         printLabelButton.addEventListener('click', function() {
-            const printArea = document.getElementById('generatedCode');
+            const formData = {
+                inspectionLot: document.getElementById('inspectionLot').value,
+                plantNumber: document.getElementById('plantNumber').value,
+                location: document.getElementById('location').value,
+                material: document.getElementById('material').value,
+                container: document.getElementById('container').value
+            };
 
-            html2canvas(printArea, { scale: 2 }).then(canvas => {
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 400px; height: 150px;">');
-                printWindow.document.write('</body></html>');
-                printWindow.document.close();
-                printWindow.focus();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
+            printWindow.document.write('<div class="label-layout" style="display: flex; align-items: center;">');
+            printWindow.document.write('<div style="flex: 1;"><canvas id="printCanvas"></canvas></div>');
+            printWindow.document.write('<div class="print-data" style="flex: 2; text-align: left;">');
+            printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
+            printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
+            printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
+            printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br>`);
+            printWindow.document.write(`<strong>Container:</strong> ${formData.container}<br>`);
+            printWindow.document.write('</div></div>');
+            printWindow.document.write('</body></html>');
+
+            printWindow.document.close();
+            printWindow.focus();
+
+            const printCanvas = printWindow.document.getElementById('printCanvas');
+            const context = printCanvas.getContext('2d');
+
+            // Renderizar o DataMatrix para o printCanvas
+            html2canvas(qrCanvas).then(canvas => {
+                printCanvas.width = canvas.width;
+                printCanvas.height = canvas.height;
+                context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+
+                // Iniciar a impressão
                 printWindow.print();
             });
         });
