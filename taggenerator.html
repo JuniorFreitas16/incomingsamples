@@ -234,10 +234,10 @@ document.getElementById('infoQuantity').textContent = formData.quantity;
         printLabelButton.addEventListener('click', function() {
             const printArea = document.getElementById('generatedCode');
 
-            html2canvas(printArea, { scale: 5 }).then(canvas => {
+            html2canvas(printArea, { scale: 2 }).then(canvas => {
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 300px; height: 100px;">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 1024px; height: 500px;">');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
