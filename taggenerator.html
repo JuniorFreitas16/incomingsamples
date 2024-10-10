@@ -192,7 +192,7 @@
         printLabelButton.addEventListener('click', function() {
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
-            printWindow.document.write('<canvas id="printCanvas"></canvas>');
+            printWindow.document.write('<canvas id="datamatrix"></canvas>');
             printWindow.document.write('</body></html>');
 
             printWindow.document.close();
