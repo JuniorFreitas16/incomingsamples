@@ -92,6 +92,31 @@
             justify-content: space-between;
             padding: 20px;
         }
+
+        /* Estilo específico para impressão */
+        @media print {
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .label-layout {
+                flex-direction: row;
+                justify-content: flex-start;
+            }
+
+            #printCanvas {
+                width: 150px;
+                height: 150px;
+                margin-right: 20px;
+            }
+
+            .print-data {
+                flex: 2;
+            }
+        }
     </style>
 </head>
 <body>
@@ -191,7 +216,7 @@
             printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
             printWindow.document.write('<div class="label-layout" style="display: flex; align-items: center;">');
             printWindow.document.write('<div style="flex: 1;"><canvas id="printCanvas"></canvas></div>');
-            printWindow.document.write('<div style="flex: 2; text-align: left;">');
+            printWindow.document.write('<div class="print-data" style="flex: 2; text-align: left;">');
             printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
             printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
             printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
@@ -208,10 +233,15 @@
 
             // Renderizar o DataMatrix para o printCanvas
             html2canvas(qrCanvas).then(canvas => {
+                // Desenhar o DataMatrix no canvas de impressão
+                printCanvas.width = canvas.width;
+                printCanvas.height = canvas.height;
                 context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+
+                // Iniciar a impressão
                 printWindow.print();
             });
         });
     </script>
 </body>
-</html>
+</html> 
