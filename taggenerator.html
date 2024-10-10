@@ -161,7 +161,7 @@
                 <p><strong>Inspection Lot:</strong> <span id="infoInspectionLot"></span></p>
                 <p><strong>Número Planta:</strong> <span id="infoPlantNumber"></span></p>
                 <p><strong>Locação:</strong> <span id="infoLocation"></span></p>
-                <p><strong>Quantidade:</strong> <span id="infoContainer"></span></p>
+                <p><strong>Quantidade:</strong> <span id="infoQuantity"></span></p>
             </div>
         </div>
 
@@ -196,9 +196,7 @@
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
                 description: document.getElementById('description').value, 
-
-                quantity:
-document.getElementById('quantity').value
+                quantity: document.getElementById('quantity').value
                 
             };
 
@@ -236,10 +234,10 @@ document.getElementById('infoQuantity').textContent = formData.quantity;
         printLabelButton.addEventListener('click', function() {
             const printArea = document.getElementById('generatedCode');
 
-            html2canvas(printArea, { scale: 2 }).then(canvas => {
+            html2canvas(printArea, { scale: 1 }).then(canvas => {
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 400px; height: 150px;">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 400px; height: 100px;">');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
