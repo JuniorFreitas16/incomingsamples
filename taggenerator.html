@@ -105,6 +105,9 @@
             .label-layout {
                 flex-direction: row;
                 justify-content: flex-start;
+                position: absolute;
+                top: 0;
+                right: 0;
             }
 
             #printCanvas {
@@ -216,14 +219,16 @@
             }
         });
 
-        // Função para imprimir a etiqueta como uma imagem em 400x150 pixels
+        // Função para imprimir a etiqueta como uma imagem em 400x150 pixels e posicionada no canto superior direito
         printLabelButton.addEventListener('click', function() {
             const printArea = document.getElementById('generatedCode');
 
             html2canvas(printArea, { scale: 2 }).then(canvas => {
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
+                printWindow.document.write('<div style="position: absolute; top: 0; right: 0;">');
                 printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 400px; height: 150px;">');
+                printWindow.document.write('</div>');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
