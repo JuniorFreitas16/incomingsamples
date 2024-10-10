@@ -218,5 +218,16 @@
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
             printWindow.document.write('<div style="font-size: 14px; text-align: center; margin-top: 20px;">');
-            printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
-            printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}); printWindow.document.write(Número Planta: ${formData.plantNumber}); printWindow.document.write(Locação: $ {formData.location}`); printWindow.document.write("); printWindow.document.write("); printWindow.document.write(");printWindow.document.close(); printWindow.focus(); const printCanvas = printWindow.document.getElementById('p rintCanvas'); const context = printCanvas.getContext('2d'); html2canvas(qrCanvas).then(canvas => { context.drawImage(canvas, 0, 0, canvas.width, canvas.height); printWindow.print(); }); }); </script></body ></html>
+            printWindow.document.write('<strong>Material:</strong> ${formData.material}<br>');
+            printWindow.document.write('<strong>Inspection Lot:</strong> ${formData.inspectionLot}');
+            printWindow.document.write('<strong>Número Planta:</strong> ${formData.plantNumber}');
+            printWindow.document.write('<strong>Locação:</strong> ${formData.location}');
+            printWindow.document.write(");
+            printWindow.document.write(");
+            printWindow.document.write(");
+            printWindow.document.close();
+            printWindow.focus();
+            
+            const printCanvas = printWindow.document.getElementById('printCanvas');
+            const context = printCanvas.getContext('2d');
+            html2canvas(qrCanvas).then(canvas => { context.drawImage(canvas, 0, 0, canvas.width, canvas.height); printWindow.print(); }); }); </script></body ></html>
