@@ -199,10 +199,10 @@
                 bwipjs.toCanvas(qrCanvas, {
                     bcid: 'datamatrix', // Barcode type
                     text: dataString,   // Text to encode
-                    scale: 3,           // 3x scaling factor
+                    scale: 1,           // 3x scaling factor
                     width: 150,         // Ajustar largura
                     height: 150,        // Ajustar altura
-                    includetext: false, // Não incluir texto abaixo do código
+                    includetext: true, // Não incluir texto abaixo do código
                 });
 
                 // Preencher as informações na div
@@ -225,7 +225,7 @@
             html2canvas(printArea, { scale: 2 }).then(canvas => {
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 400px; height: 150px;">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width: 600px; height: 350px;">');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
