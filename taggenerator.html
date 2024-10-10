@@ -86,12 +86,6 @@
             text-decoration: underline;
         }
 
-        .label-layout {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-        }
     </style>
 </head>
 <body>
@@ -115,9 +109,6 @@
 
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
-
-            <label for="container">Container:</label>
-            <input type="text" id="container" required>
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -157,20 +148,22 @@
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
                 description: document.getElementById('description').value,
-                container: document.getElementById('container').value
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.container}`;
+            // Limpeza da string de dados para evitar caracteres não suportados
+            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description}`;
+            const sanitizedDataString = dataString.replace(/[^a-zA-Z0-9 ;]/g, ''); // Remover caracteres especiais
 
             try {
                 // Gerar DataMatrix usando bwip-js
                 bwipjs.toCanvas(qrCanvas, {
-                    bcid: 'datamatrix', // Barcode type
-                    text: dataString,   // Text to encode
-                    scale: 3,           // 3x scaling factor
-                    width: 200,         // Width for better visualization
-                    height: 200,        // Height for better visualization
-                    includetext: false, // Do not include text below barcode
+                    bcid: 'datamatrix', // Tipo de código de barras
+                    text: sanitizedDataString, // Texto para codificar
+                    scale: 3, // Fator de escala 3x
+                    width: 150, // Largura do código de barras
+                    height: 150, // Altura do código de barras
+                    includetext: false, // Não incluir o texto
+                    textxalign: 'center',
                 });
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
@@ -185,7 +178,6 @@
                 ["Locação", document.getElementById('location').value],
                 ["Material", document.getElementById('material').value],
                 ["Descrição", document.getElementById('description').value],
-                ["Container", document.getElementById('container').value]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(formData);
@@ -206,7 +198,6 @@
             doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
             doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
             doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
-            doc.text(`Container: ${document.getElementById('container').value}`, 20, 80);
 
             html2canvas(qrCanvas).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
@@ -215,27 +206,12 @@
             });
         });
 
-        // Função para imprimir a etiqueta com DataMatrix à esquerda e dados à direita
+        // Função para imprimir a etiqueta
         printLabelButton.addEventListener('click', function() {
-            const formData = {
-                inspectionLot: document.getElementById('inspectionLot').value,
-                plantNumber: document.getElementById('plantNumber').value,
-                location: document.getElementById('location').value,
-                material: document.getElementById('material').value,
-                container: document.getElementById('container').value
-            };
-
             const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
-            printWindow.document.write('<div class="label-layout" style="display: flex; align-items: center;">');
-            printWindow.document.write('<div style="flex: 1;"><canvas id="printCanvas"></canvas></div>');
-            printWindow.document.write('<div style="flex: 2; text-align: left;">');
-            printWindow.document.write(`<strong>Container:</strong> ${formData.container}<br>`);
-            printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
-            printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
-            printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
-            printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br>`);
-            printWindow.document.write('</div></div>');
+            printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
+            printWindow.document.write('<h1>Etiqueta Gerada</h1>');
+            printWindow.document.write('<canvas id="printCanvas"></canvas>');
             printWindow.document.write('</body></html>');
 
             printWindow.document.close();
@@ -244,7 +220,6 @@
             const printCanvas = printWindow.document.getElementById('printCanvas');
             const context = printCanvas.getContext('2d');
 
-            // Renderizar o DataMatrix para o printCanvas
             html2canvas(qrCanvas).then(canvas => {
                 context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
                 printWindow.print();
@@ -252,4 +227,4 @@
         });
     </script>
 </body>
-</html>
+</
