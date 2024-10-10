@@ -68,11 +68,38 @@
             justify-content: space-between;
         }
 
+        .navigation {
+            padding: 20px;
+            background-color: #0033a0;
+            color: white;
+            text-align: left;
+        }
+
+        .navigation a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+
+        .label-layout {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Gerador de DataMatrix - Incoming Inspection VD</h1>
     <div class="container">
+        <div class="navigation">
+            <a href="index.html">Voltar</a>
+        </div>
         <form id="dataForm">
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
@@ -89,8 +116,8 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="quantity">Quantidade Lote:</label>
-            <input type="number" id="quantity" required>
+            <label for="container">Container:</label>
+            <input type="text" id="container" required>
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -130,10 +157,10 @@
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
                 description: document.getElementById('description').value,
-                quantity: document.getElementById('quantity').value
+                container: document.getElementById('container').value
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.quantity}`;
+            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.container}`;
 
             try {
                 // Gerar DataMatrix usando bwip-js
@@ -158,7 +185,7 @@
                 ["Locação", document.getElementById('location').value],
                 ["Material", document.getElementById('material').value],
                 ["Descrição", document.getElementById('description').value],
-                ["Quantidade", document.getElementById('quantity').value]
+                ["Container", document.getElementById('container').value]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(formData);
@@ -179,7 +206,7 @@
             doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
             doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
             doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
-            doc.text(`Quantidade: ${document.getElementById('quantity').value}`, 20, 80);
+            doc.text(`Container: ${document.getElementById('container').value}`, 20, 80);
 
             html2canvas(qrCanvas).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
@@ -188,11 +215,27 @@
             });
         });
 
-        // Função para imprimir a etiqueta
+        // Função para imprimir a etiqueta com DataMatrix à esquerda e dados à direita
         printLabelButton.addEventListener('click', function() {
+            const formData = {
+                inspectionLot: document.getElementById('inspectionLot').value,
+                plantNumber: document.getElementById('plantNumber').value,
+                location: document.getElementById('location').value,
+                material: document.getElementById('material').value,
+                container: document.getElementById('container').value
+            };
+
             const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
-            printWindow.document.write('<canvas id="datamatrix"></canvas>');
+            printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
+            printWindow.document.write('<div class="label-layout" style="display: flex; align-items: center;">');
+            printWindow.document.write('<div style="flex: 1;"><canvas id="printCanvas"></canvas></div>');
+            printWindow.document.write('<div style="flex: 2; text-align: left;">');
+            printWindow.document.write(`<strong>Material:</strong> ${formData.material}<br>`);
+            printWindow.document.write(`<strong>Inspection Lot:</strong> ${formData.inspectionLot}<br>`);
+            printWindow.document.write(`<strong>Número Planta:</strong> ${formData.plantNumber}<br>`);
+            printWindow.document.write(`<strong>Locação:</strong> ${formData.location}<br>`);
+            printWindow.document.write(`<strong>Container:</strong> ${formData.container}<br>`);
+            printWindow.document.write('</div></div>');
             printWindow.document.write('</body></html>');
 
             printWindow.document.close();
@@ -201,6 +244,7 @@
             const printCanvas = printWindow.document.getElementById('printCanvas');
             const context = printCanvas.getContext('2d');
 
+            // Renderizar o DataMatrix para o printCanvas
             html2canvas(qrCanvas).then(canvas => {
                 context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
                 printWindow.print();
