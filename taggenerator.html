@@ -67,38 +67,12 @@
             display: flex;
             justify-content: space-between;
         }
-        .navigation {
-        padding: 20px;
-        background-color: #0033a0;
-        color: white;
-        text-align: left;
-        }
-
-        /*.navigation {
-            text-align: left;
-            margin-bottom: 20px;
-        }*/
-
-        .navigation a {
-            /*color: #0033a0; /* Royal Blue */
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 10px;
-        }
-
-        .navigation a:hover {
-            text-decoration: underline;
-        }
 
     </style>
 </head>
 <body>
     <h1>Gerador de DataMatrix - Incoming Inspection VD</h1>
     <div class="container">
-        <div class="navigation">
-            <a href="index.html">Voltar</a>
-        </div>
         <form id="dataForm">
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
@@ -115,8 +89,8 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <!--<label for="quantity">Quantidade Lote:</label>-->
-            <input type="hidden" id="quantity">
+            <label for="quantity">Quantidade Lote:</label>
+            <input type="number" id="quantity" required>
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -131,7 +105,6 @@
             <button id="exportPDF">Exportar para PDF</button>
             <button id="printLabel">Imprimir Etiqueta</button>
         </div>
-        <a href="index.html">Dashboard</a>
     </div>
 
     <!-- Bibliotecas necessárias -->
@@ -218,8 +191,7 @@
         // Função para imprimir a etiqueta
         printLabelButton.addEventListener('click', function() {
             const printWindow = window.open('', '_blank');
-            printWindow.document.write('<!DOCTYPE html><head><title>Imprimir Etiqueta</title></head><body>');
-            printWindow.document.write('<h1>Etiqueta Gerada</h1>');
+            printWindow.document.write('<html><head><title>Data Matrix</title></head><body>');
             printWindow.document.write('<canvas id="printCanvas"></canvas>');
             printWindow.document.write('</body></html>');
 
