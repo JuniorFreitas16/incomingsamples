@@ -168,51 +168,13 @@
                     bcid: 'datamatrix', // Barcode type
                     text: dataString,   // Text to encode
                     scale: 3,           // 3x scaling factor
-                    width: 200,         // Width for better visualization
-                    height: 200,        // Height for better visualization
-                    includetext: false, // Do not include text below barcode
+                    width: 150,         // Ajustar largura
+                    height: 150,        // Ajustar altura
+                    includetext: false, // Não incluir texto abaixo do código
                 });
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
             }
-        });
-
-        // Função para exportar para Excel
-        exportExcelButton.addEventListener('click', function() {
-            const formData = [
-                ["Inspection Lot", document.getElementById('inspectionLot').value],
-                ["Número Planta", document.getElementById('plantNumber').value],
-                ["Locação", document.getElementById('location').value],
-                ["Material", document.getElementById('material').value],
-                ["Descrição", document.getElementById('description').value],
-                ["Container", document.getElementById('container').value]
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet(formData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Data");
-
-            XLSX.writeFile(wb, 'datamatrix_data.xlsx');
-        });
-
-        // Função para exportar para PDF
-        exportPDFButton.addEventListener('click', function() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.text('DataMatrix Gerado', 20, 20);
-            doc.text(`Inspection Lot: ${document.getElementById('inspectionLot').value}`, 20, 30);
-            doc.text(`Número Planta: ${document.getElementById('plantNumber').value}`, 20, 40);
-            doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
-            doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
-            doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
-            doc.text(`Container: ${document.getElementById('container').value}`, 20, 80);
-
-            html2canvas(qrCanvas).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                doc.addImage(imgData, 'PNG', 20, 90, 50, 50);
-                doc.save('datamatrix_data.pdf');
-            });
         });
 
         // Função para imprimir a etiqueta com DataMatrix à esquerda e dados à direita
