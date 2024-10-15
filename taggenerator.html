@@ -156,7 +156,7 @@
         </form>
 
         <div class="generated-code" id="generatedCode" style="margin:0px">
-            <div id="toPrint" style="width:430px;height:260px;display:flex;justify-content:center;align-items:center;padding:0px;text-align:left">
+            <div id="toPrint" style="width:500px;height:260px;display:flex;justify-content:center;align-items:center;padding:0px;text-align:left">
             <canvas id="datamatrix" style="width:220px;height:220px"></canvas>
             <div class="data-info">
                 <p><strong>Container:</strong> <span id="infoContainer"></span></p>             
@@ -238,7 +238,7 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
                 printWindow.document.write('<div style="position: absolute; top: 0; left: 0;">');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:430px;height:260px;display:flex;justify-content:left;top: 0;">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:500px;height:260px;display:flex;justify-content:left;top: 0;">');
                 printWindow.document.write('</div>');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
