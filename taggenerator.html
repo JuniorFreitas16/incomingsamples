@@ -230,6 +230,46 @@
             }
         });
 
+        // Função para exportar para Excel
+        exportExcelButton.addEventListener('click', function() {
+            const formData = [
+                ["Container", document.getElementById('container').value],
+                ["Inspection Lot", document.getElementById('inspectionLot').value],
+                ["Número Planta", document.getElementById('plantNumber').value],
+                ["Locação", document.getElementById('location').value],
+                ["Material", document.getElementById('material').value],
+                ["Descrição", document.getElementById('description').value],
+                ["Quantidade", document.getElementById('quantity').value]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(formData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+
+            XLSX.writeFile(wb, 'datamatrix_data.xlsx');
+        });
+
+        // Função para exportar para PDF
+        exportPDFButton.addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text('DataMatrix Gerado', 20, 20);
+            doc.text(`Container: ${document.getElementById('container').value}`, 20, 30);
+            doc.text(`Inspection Lot: ${document.getElementById('inspectionLot').value}`, 20, 30);
+            doc.text(`Planta: ${document.getElementById('plantNumber').value}`, 20, 40);
+            doc.text(`Locação: ${document.getElementById('location').value}`, 20, 50);
+            doc.text(`Material: ${document.getElementById('material').value}`, 20, 60);
+            doc.text(`Descrição: ${document.getElementById('description').value}`, 20, 70);
+            doc.text(`Quantidade: ${document.getElementById('quantity').value}`, 20, 80);
+
+            html2canvas(qrCanvas).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 20, 90, 50, 50);
+                doc.save('datamatrix_data.pdf');
+            });
+        });
+
         // Função para imprimir a etiqueta como uma imagem em 400x150 pixels e posicionada no canto superior direito
         printLabelButton.addEventListener('click', function() {
             const printArea = document.getElementById('generatedCode');
