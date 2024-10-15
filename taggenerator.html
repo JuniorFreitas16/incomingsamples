@@ -155,8 +155,8 @@
         </form>
 
         <div class="generated-code" id="generatedCode" style="margin:0px">
-            <div id="toPrint" style="width:400px;height:220px;display:flex;justify-content:center;align-items:center;padding:10px;text-align:left">
-            <canvas id="datamatrix" style="width:200px;height:200px"></canvas>
+            <div id="toPrint" style="width:420px;height:240px;display:flex;justify-content:center;align-items:center;padding:10px;text-align:left">
+            <canvas id="datamatrix" style="width:220px;height:220px"></canvas>
             <div class="data-info">
                 <p><strong>Container:</strong> <span id="infoContainer"></span></p>             
                 <p><strong>Material:</strong> <span id="infoMaterial"></span></p>
@@ -210,8 +210,8 @@
                     bcid: 'datamatrix', // Barcode type
                     text: dataString,   // Text to encode
                     scale: 4,           // 4x scaling factor (ajuste para 200x200)
-                    width: 200,         // Definir a largura para 200px
-                    height: 200,        // Definir a altura para 200px
+                    width: 220,         // Definir a largura para 200px
+                    height: 220,        // Definir a altura para 200px
                     includetext: false, // Não incluir texto abaixo do código
                 });
 
@@ -237,7 +237,7 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
                 printWindow.document.write('<div style="position: absolute; top: 0; left: 0;">');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:400px;height:200px;display:flex;justify-content:left;top: 0; 10,10">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:420px;height:240px;display:flex;justify-content:left;top: 0; 10,10">');
                 printWindow.document.write('</div>');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
