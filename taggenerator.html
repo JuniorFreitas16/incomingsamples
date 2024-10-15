@@ -229,7 +229,7 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
                 printWindow.document.write('<div style="position: absolute; top: 0; left: 0;">');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:700px;height:250px;display:flex;justify-content:left;top: 0">');
+                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:400px;height:300px;display:flex;justify-content:left;top: 0">');
                 printWindow.document.write('</div>');
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
