@@ -129,6 +129,10 @@
             <a href="index.html">Voltar</a>
         </div>
         <form id="dataForm">
+            
+            <label for="container">Container:</label>
+            <input type="text" id="container" required>
+            
             <label for="inspectionLot">Inspection Lot:</label>
             <input type="text" id="inspectionLot" required>
 
@@ -144,8 +148,8 @@
             <label for="description">Descrição:</label>
             <input type="text" id="description" required>
 
-            <label for="container">Container:</label>
-            <input type="text" id="container" required>
+            <label for="quantity">Quantidade:</label>
+            <input type="number" id="quantity" required>
 
             <button type="submit">Gerar DataMatrix</button>
         </form>
@@ -193,10 +197,11 @@
                 location: document.getElementById('location').value,
                 material: document.getElementById('material').value,
                 description: document.getElementById('description').value,
-                container: document.getElementById('container').value
+                container: document.getElementById('container').value,
+                quantity: document.getElementById('quantity').value
             };
 
-            const dataString = `${formData.inspectionLot};${formData.plantNumber};${formData.location};${formData.material};${formData.description};${formData.container}`;
+            const dataString = `${formData.inspectionLot}*${formData.plantNumber}*${formData.location}*${formData.material}*${formData.description}*${formData.quantity}`;
 
             try {
                 // Gerar DataMatrix usando bwip-js e garantir que seja 200x200 pixels
@@ -210,11 +215,13 @@
                 });
 
                 // Preencher as informações na div ao lado do DataMatrix
+                document.getElementById('infoContainer').textContent = formData.container;
                 document.getElementById('infoMaterial').textContent = formData.material;
                 document.getElementById('infoInspectionLot').textContent = formData.inspectionLot;
                 document.getElementById('infoPlantNumber').textContent = formData.plantNumber;
                 document.getElementById('infoLocation').textContent = formData.location;
-                document.getElementById('infoContainer').textContent = formData.container;
+                document.getElementById('infoQuantity').textContent = formData.quantity;
+                
 
             } catch (e) {
                 console.error('Erro ao gerar DataMatrix:', e);
