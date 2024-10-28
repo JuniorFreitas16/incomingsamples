@@ -102,23 +102,26 @@
                 width: 100%;
                 height: 100%;
             }
-
-            .label-layout {
-                flex-direction: row;
-                justify-content: flex-start;
+        
+            #toPrint {
                 position: absolute;
                 top: 0;
-                right: 0;
+                left: 0;
+                width: 100mm !important; /* Largura fixa em milímetros */
+                height: 50mm !important; /* Altura fixa em milímetros */
+                display: flex;
+                justify-content: left;
+                padding: 0;
             }
-
-            #printCanvas {
-                width: 200px;
-                height: 200px;
-                margin-right: 20px;
+        
+            #datamatrix {
+                width: 40mm !important; /* Largura fixa do DataMatrix */
+                height: 40mm !important; /* Altura fixa do DataMatrix */
             }
-
-            .print-data {
-                flex: 2;
+        
+            .data-info {
+                margin-left: 5mm;
+                font-size: 8pt; /* Tamanho de fonte fixo para impressão */
             }
         }
     </style>
@@ -156,8 +159,8 @@
         </form>
 
         <div class="generated-code" id="generatedCode" style="margin-top: 5px">
-            <div id="toPrint" style="width:500px;height:260px;display:flex;justify-content:center;padding:0px;text-align:left">
-            <canvas id="datamatrix" style="width:220px;height:220px"></canvas>
+           <div id="toPrint" style="width:100mm;height:50mm;display:flex;justify-content:left;padding:0;">
+            <canvas id="datamatrix" style="width:40mm;height:40mm"></canvas>
             <div class="data-info">
                 <p><strong>Container:</strong> <span id="infoContainer"></span></p>             
                 <p><strong>Material:</strong> <span id="infoMaterial"></span></p>
@@ -272,18 +275,49 @@
 
         // Função para imprimir a etiqueta como uma imagem em 400x150 pixels e posicionada no canto superior direito
         printLabelButton.addEventListener('click', function() {
-            const printArea = document.getElementById('generatedCode');
-
-            html2canvas(toPrint, { scale: 2 }).then(canvas => {
+            const printArea = document.getElementById('toPrint');
+            
+            html2canvas(printArea, {
+                scale: 2,
+                useCORS: true,
+                width: 377, // 100mm em pixels (aproximadamente)
+                height: 189 // 50mm em pixels (aproximadamente)
+            }).then(canvas => {
                 const printWindow = window.open('', '_blank');
-                printWindow.document.write('<html><head><title>Imprimir Etiqueta</title></head><body>');
-                printWindow.document.write('<div style="position: absolute; top: 0; left: 0;width:20em;height:15em;display:flex;justify-content:left;padding:0px;">');
-                printWindow.document.write('<img src="' + canvas.toDataURL() + '" style="width:20em;height:15em;display:flex;justify-content:left;padding:0px;top: 0;">');
-                printWindow.document.write('</div>');
-                printWindow.document.write('</body></html>');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Imprimir Etiqueta</title>
+                        <style>
+                            @page {
+                                size: 100mm 50mm;
+                                margin: 0;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            img {
+                                width: 100mm;
+                                height: 50mm;
+                                object-fit: contain;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${canvas.toDataURL('image/png')}" />
+                    </body>
+                    </html>
+                `);
                 printWindow.document.close();
-                printWindow.focus();
-                printWindow.print();
+                
+                // Aguarda o carregamento da imagem antes de imprimir
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                    // printWindow.close();
+                }, 500);
             });
         });
     </script>
